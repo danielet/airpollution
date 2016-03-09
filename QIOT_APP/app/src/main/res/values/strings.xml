@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">QIOT</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_create_id">CreateIDActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!--  DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <!--  URL -->
+    <string name="logIn_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_insert_device.php</string>
+    <string name="SignUp_url">http://airpollution.calit2.net/TeamC/html/sign_up.php</string>
+    <string name="receive_start_url"> http://airpollution.calit2.net/TeamC/php/receive_data/receive_session_start.php</string>
+    <string name="receive_end_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_session_end.php</string>
+    <string name="csv_transfer_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_csv.php</string>
+    <string name="realtime_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_realtime_data.php</string>
+
+</resources>

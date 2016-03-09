@@ -1,0 +1,64 @@
+html, body {
+height: 100%;
+width: 100%;
+margin-left:0;
+padding: 0;
+
+}
+
+
+.vert{
+    /*margin-left: 10px;*/
+    margin-bottom: 5px;
+    width:100%;
+}
+
+.mapReal{
+    margin-top: 10px;
+    /*margin-bottom: 20px;*/
+    width: 30%;
+   font-size: 12px;
+   display:inline-block;
+}
+
+.info_value{
+    font-size: 12px;
+}
+
+#navbar{
+    background: #000;
+
+}
+ 
+#sidebar-wrapper { 
+	position: fixed;
+	width: 10%;
+	height: 100%;	
+	background: #000;
+	
+}
+ 
+#page-content-wrapper {
+	width: 100%;
+	padding: 20px;
+}
+ 
+
+
+#s_right{
+	float:left;
+    /*margin-left:2%;*/
+    background: #000;
+    height: 93%; 
+    width: 19%;
+}
+
+#map {
+    margin-left:11%;
+    margin-top : 1%;
+    float:left;
+    height: 90%;
+    width:70%;
+}
+     
+
