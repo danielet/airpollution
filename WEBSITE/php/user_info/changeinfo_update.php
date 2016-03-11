@@ -1,13 +1,16 @@
 <?php
+
 include("../include.php");
 
-$user_id=$_SESSION["user_id"]; //current connect id
+// $user_id=$_SESSION["userid"]; //current connect id
+
 $addr=$_POST["addr"]; // receive address
 $name=$_POST["name"]; // receive name
+
 $password2=$_POST["pwd2"]; // receive password (pw2=confirm password)
 $count=$_POST["count"];  // receive login count
 
-$chk_sql = "select * from user where user_id = '".trim($_SESSION["user_id"])."'"; //useid existence confrim in database
+$chk_sql = "SELECT * FROM user WHERE user_id = '".trim($_SESSION["user_id"])."'"; //useid existence confrim in database
 $chk_result = sql_query($chk_sql); // execute query
 $chk_data = mysql_fetch_array($chk_result); // save database data in array
 $password=md5($_POST["pwd"]+$chk_data["salt"]); // hashed password
@@ -16,9 +19,9 @@ $password=md5($_POST["pwd"]+$chk_data["salt"]); // hashed password
   
  if($_POST["pwd"]==$_POST["pwd2"]  )
  {
-  $sql = "update user set hashed_pw='".$password."' where user_id = '".trim($_SESSION["user_id"])."'"; // if input password with confirm password same, change new password
+  $sql = "UPDATE user SET hashed_pw='".$password."' WHERE user_id = '".trim($_SESSION["user_id"])."'"; // if input password with confirm password same, change new password
   sql_query($sql); //execute query
-  $sql2 = "update user set addr='".$addr."' where user_id = '".trim($_SESSION["user_id"])."'"; //if input new address, change address
+  $sql2 = "UPDATE user set addr='".$addr."' WHERE user_id = '".trim($_SESSION["user_id"])."'"; //if input new address, change address
   sql_query($sql2); //execute query
   
    ?>   <script>
@@ -26,7 +29,7 @@ $password=md5($_POST["pwd"]+$chk_data["salt"]); // hashed password
         </script>
 		<meta charset="utf-8">;
 		<script>
-		location.replace("../../html/Main.php"); //after change the password and addres, back the befor page
+		location.replace("../../index.php"); //after change the password and addres, back the befor page
 		</script>
         <?
  }   

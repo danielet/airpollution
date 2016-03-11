@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+
+<?php
+include_once '../php/include.php';
+
+sec_session_start();
+?>
+
+
 <html>
   <head>
     <meta charset="utf-8">
@@ -17,8 +24,17 @@
 
   </head>
 
-  <body>    
+  <body onload="testMarker();">    
   
+  <?php
+  
+    if(login_check()!= true)
+    {
+      // echo 'QUA';
+      header('Location: http://airpollution.calit2.net/WEBSITE/');
+    }
+  ?>
+
   <div id="navbar" class="navbar-collapse collapse">
     <h1><span class="label navbar-left">Air Pollution Testbed</span></h1> 
   <form name="login_form" method="post" action="./login_match.php" class="navbar-form navbar-right">
@@ -135,8 +151,8 @@
   
   <button id="drop" class="btn btn-warning" style="width:100%;" onclick="drop();">Start</button>   
   
-  <!-- <div id="chart_div">
-  </div>     -->                       
+  <div id="chart_div">
+  </div>                           
   
   </div>
   </div>      

@@ -14,11 +14,14 @@ google.setOnLoadCallback(drawChart);
 
 
 //CHECK EVERY 5 SECONDS
-$(document).ready(function() {
-	$("#drop").click(function() {
+
+function testMarker()
+{
+  // $(document).ready(function() {
+  // $("#drop").click(function() {
+    
 		var url = "../php/map/googlemap_array.php"		
 		setInterval(function (){
-	
 			$.ajax({
 				type: "POST",
 				url: url,
@@ -29,29 +32,29 @@ $(document).ready(function() {
           neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
 					{				    
-					 neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
-					 }
+            neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
+					}
           drop();
 					chart_information(remember_id);
 					
-
           //TO END
-          // drawChart(chart); 					
-					
+          // drawChart(chart); 										
           air_update(temp);				
 				}
 			});				
 		},5000);	
-	});
-});
+	// });
+// });
 
-
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
     zoom: 13,
     center: {lat: 32.899, lng: -117.22}
   });
+
+  
 }
 
 
@@ -156,40 +159,26 @@ function drop() {
 }
 
 function addMarkerWithTimeout(position, timeout,sq) {
-	var image;
-	if(sq==0){
-	 image = "../img/marker1.png";
-	}
-	else if(sq==1){
-	image = "../img/marker2.png";
-	}
-	else if(sq==2){
-	image = "../img/marker3.png";
-	}
-	else if(sq==3){
-	image = "../img/marker4.png";
-	}
-	else{
-		image = "../img/marker5.png";
-	}
+	
 	
   
   window.setTimeout(function() {
-  	 marker = new google.maps.Marker(
-    	{position: position, 
-    	 map: map,
-    	 icon: image,
-    	 sq:sq    // marker select sequence number.
-    	 }
-    	);       
-       	 markers.push(marker);     	 
-    	 marker.addListener('click', function() {
-    	 	remember_id = arr[sq].session_id;
-    	 	chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
-    	 	air_update(sq); 
+    marker = new google.maps.Marker(
+    {
+      position: position, 
+      map:      map,
+      sq:       sq    // marker select sequence number.
+    });       
+
+  markers.push(marker);     	 
+  marker.addListener('click', function() {
+  remember_id = arr[sq].session_id;
+  chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
+  air_update(sq); 
 	       // map.setCenter(marker.getPosition());
   });	
-  }, timeout);   
+  }, timeout); 
+
 }
 
 function setMapOnAll(map) {
@@ -307,7 +296,7 @@ function drawChart(chart) {
   // Create our data table out of JSON data loaded from server.
   var data = new google.visualization.DataTable(chart);
   var options = {
-       title: 'Air Pollution',
+      title: 'Air Pollution',
       is3D: 'true',
       width: 400,
       height: 300,

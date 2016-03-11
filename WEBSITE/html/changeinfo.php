@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+
+<?php
+include_once '../php/include.php';
+
+sec_session_start();
+?>
+<html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,33 +14,36 @@
 
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="../css/googleMapsCSS.css" rel="stylesheet">
     
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
   </head>
   <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="./Main.php"><input type="image" style="width:150px; height:50px;" src="../img/QI1.png"></a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <form name="login_form" method="post" action="../php/login_match.php" class="navbar-form navbar-right">
-            <div class="form-group">
-             <a href="../php/user_info/logout.php"><input name="logout" value="logout"type="button" placeholder="ID" class="btn btn-success"></a>
-            </div>
-            
-            <a href="./changeinfo.php"><button type="button" class="btn btn-success">Modify</button></a>
-          </form>
-        </div><!--/.navbar-collapse -->
-      </div>
-    </nav>
+    <?php
+  
+    if(login_check()!= true)
+    {
+      header('Location: http://airpollution.calit2.net/WEBSITE/');
+    }
+  ?>
 
+  <div id="navbar" class="navbar-collapse collapse">
+    <h1><span class="label navbar-left">Air Pollution Testbed</span></h1> 
+  <form name="login_form" method="post" action="./login_match.php" class="navbar-form navbar-right">
+  <div class="form-group">    
+  <a href="../php/user_info/logout.php"><input name="logout" value="Logout"type="button" placeholder="ID" class="btn btn-success"></a>
+  <a href="./googlemap.php"><button type="button" class="btn btn-success">Map</button></a>                      
+  <a href="../index.php"><button type="button" class="btn btn-success">Home</button></a>                      
+  </div>
+  </form>
+</div>
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
@@ -77,22 +86,19 @@
           
         </div>
       </div>
-
-      <hr>
-
-      <footer>
-        <p>&copy; Qualcomm Institute 2016</p>
-      </footer>
+    
     </div> <!-- /container -->
+    <div id="containterAfterNav2" >      
+    </div>
+<div class="container">
+      <hr>    
+      <footer>      
+        <p>Qualcomm Institute 2016 PhD Matteo Danieletto and PhD Seokheon Cho</p>
+        <p> matteo dot danieletto at eng dot ucsd dot edu</p>
+      </footer>
+    </div>  
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    
   </body>
   	<script>
 // 5.입력필드 검사함수
