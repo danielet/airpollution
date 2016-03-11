@@ -20,11 +20,11 @@
     <string name="button_scan">Scan for devices</string>
 
     <!--  URL -->
-    <string name="logIn_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_insert_device.php</string>
-    <string name="SignUp_url">http://airpollution.calit2.net/TeamC/html/sign_up.php</string>
-    <string name="receive_start_url"> http://airpollution.calit2.net/TeamC/php/receive_data/receive_session_start.php</string>
-    <string name="receive_end_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_session_end.php</string>
-    <string name="csv_transfer_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_csv.php</string>
-    <string name="realtime_url">http://airpollution.calit2.net/TeamC/php/receive_data/receive_realtime_data.php</string>
+    <string name="logIn_url">http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_insert_device.php</string>
+    <string name="SignUp_url">http://airpollution.calit2.net/WEBSITE/html/sign_up.php</string>
+    <string name="receive_start_url"> http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_session_start.php</string>
+    <string name="receive_end_url">http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_session_end.php</string>
+    <string name="csv_transfer_url">http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_csv.php</string>
+    <string name="realtime_url">http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_realtime_data.php</string>
 
 </resources>

@@ -166,7 +166,7 @@ if __name__ == "__main__":
 	
 	mac_address=getHwAddr('wlan0')
 	#1. LOGIN
-	URL_LOGIN = 'http://airpollution.calit2.net/TeamC/php/receive_data/receive_insert_device.php'
+	URL_LOGIN = 'http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_insert_device.php'
 	query_args 	= { 'data':userid+','+pswd +','+mac_address+',UDOO,0,0,0' }
 	data 		= urllib.urlencode(query_args)
 
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 	print html
 	response.close()  # best practice to close the file
 	#2. START SESSION	
-	URL_SESSION 	='http://airpollution.calit2.net/TeamC/php/receive_data/receive_session_start.php'
+	URL_SESSION 	='http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_session_start.php'
 
 	values = {'uid' : userid  , 'mac' : mac_address, 'time': timesession, 'smac' :'EC:11:27:6F:BB:54'}
 	req = urllib2.Request(URL_SESSION, json.dumps(values), headers={'Content-type': 'application/json', 'Accept': 'application/json'})
@@ -185,6 +185,6 @@ if __name__ == "__main__":
 	response.close() 
 	print html
 
-	URL_REAL 	='http://airpollution.calit2.net/TeamC/php/receive_data/receive_realtime_data.php'
+	URL_REAL 	='http://airpollution.calit2.net/WEBSITE/php/receive_data/receive_realtime_data.php'
 	startStation(fileValues, userid ,mac_address, URL_REAL)	
 
