@@ -16,14 +16,13 @@ sec_session_start();
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/googleMapsCSS.css" rel="stylesheet">
     
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap.min.js"></scrip
+    t>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-
+    <script type="text/javascript" src="../js/changeInfo.js"></script>     
   </head>
   <body>
     <?php
@@ -100,42 +99,4 @@ sec_session_start();
 
     
   </body>
-  	<script>
-// 5.입력필드 검사함수
-function member_save()
-{
-    // 6.form 을 f 에 지정
-    var f = document.join;
-
-
-    if(f.pwd.value == ""){
-        alert("Please Insert PW");
-        
-        return false;
-    }
-    
-    if(f.school.value == ""){
-        alert("Please Insert School Name");
-        
-        return false;
-    }
-    
-    if(f.tel.value == ""){
-        alert("Please Insert Tel Num");
-        
-        return false;
-    }
-
-    if(f.pwd.value != f.pwd2.value){
-        // 9.비밀번호와 확인이 서로 다르면 경고창으로 메세지 출력 후 함수 종료
-        alert("Please Confirm PW");
-        
-        return false;
-    }
-
-    // 10.검사가 성공이면 form 을 submit 한다
-    f.submit();
-
-}
-</script>
 </html>

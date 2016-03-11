@@ -59,85 +59,86 @@ sec_session_start();
 
   
   <div id ='s_right'>  
-  <div id='quick' >
-  <span class="label label-primary mapReal">ID</span>
+    <h1><span class="label label-info" style="width:100%">INFO Real Time</span></h1>
+  <!-- <div id='quick' >
+  <span class="label label-info mapReal">ID</span>
   <span id ="info1" class="label info_value " aria-describedby="basic-addon1"> ID VALUE </span>		
-  </div>
+  </div> -->
         
   <div id='quick2'>
-  <span class="label label-primary mapReal">TIME</span>
+  <span class="label label-info mapReal">TIME</span>
   <span id="info2" name ="2"  class='label info_value'   aria-describedby="basic-addon1">TIME</span>		  
   </div>
   
        
   <div id = 'quick3'>
-  <span class="label label-primary mapReal">LAT</span>  
+  <span class="label label-info mapReal">LAT</span>  
   <span id="info3" name="3" class='label info_value'   aria-describedby="basic-addon1">LAT</span>
   </div>
           
   <div id = 'quick4'>
-  <span class="label label-primary mapReal">LNG</span>
+  <span class="label label-info mapReal">LNG</span>
   <span id="info4" name="4" class='label info_value'  aria-describedby="basic-addon1">LNG</span>
   </div>
          
   <div id = 'quick5'>
-  <span class="label label-success mapReal">CO</span>
+  <span class="label label-info mapReal">CO</span>
   <span id="info5" name="4" class='label info_value'  aria-describedby="basic-addon1">CO</span>
   </div>
           
   <div id = 'quick6'>
-  <span class="label label-success mapReal">NO2</span>
+  <span class="label label-info mapReal">NO2</span>
   <span id="info6" name="4" class='label info_value'  aria-describedby="basic-addon1">NO2</span>
   </div>         
   
        
   <div id='quick7'>  	   	       
-  <span class="label label-success mapReal">SO2</span>
+  <span class="label label-info mapReal">SO2</span>
   <span id="info7" name="4" class='label info_value'  aria-describedby="basic-addon1">SO2</span>
   </div>
         
   <div id='quick8'>  	   	       
-  <span class="label label-success mapReal">O3</span>
+  <span class="label label-info mapReal">O3</span>
   <span id="info8" name="4" class='label info_value' aria-describedby="basic-addon1">CO</span>
   </div>
         
   <div id='quick13'>               
-  <span class="label label-success mapReal">PM2.5</span>
+  <span class="label label-info mapReal">PM2.5</span>
   <span id="info13" name="4" class='label info_value'  aria-describedby="basic-addon1">PM2.5</span>
   </div>
 
   <div id='quick9'>  	   	       
-  <span class="label label-danger mapReal">AVG_CO</span>
+  <span class="label label-primary mapReal">AVG_CO</span>
   <span id="info9" name="4" class='label info_value'  aria-describedby="basic-addon1">AVG_CO</span>
   </div>
           
   <div id='quick10'>  	   	       
-  <span class="label label-danger mapReal">AVG_NO2</span>
+  <span class="label label-primary mapReal">AVG_NO2</span>
   <span id="info10" name="4" class='label info_value'  aria-describedby="basic-addon1">AVG_NO2</span>
   </div>
           
   <div id='quick11'>  	   	       
-  <span class="label label-danger mapReal">AVG_SO2</span>
+  <span class="label label-primary mapReal">AVG_SO2</span>
   <span id="info11" name="4" class='label info_value'  aria-describedby="basic-addon1">AVG_SO2</span>
   </div>
           
   <div id='quick12'>  	   	       
-  <span class="label label-danger mapReal">AVG_O3</span>
+  <span class="label label-primary mapReal">AVG_O3</span>
   <span id="info12" name="4" class='label info_value'  aria-describedby="basic-addon1">AVG_O3</span>
   </div>
           
   <div id='quick14'>  	   	       
-  <span class="label label-success mapReal">Temp[C]</span>
+  <span class="label label-info mapReal">Temp[C]</span>
   <span id="info14" name="4" class='label info_value'  aria-describedby="basic-addon1">TEMP</span>
   </div>                         
   
           
   <div id='quick15'>  	   	       
-  <span class="label label-success mapReal" >RR</span>
+  <span class="label label-info mapReal" >RR</span>
   <span id="info15" class="label info_value" aria-describedby="basic-addon1">RR</span>
   </div>
       
-  <form name="sendForm" method="get" >
+  <!-- <form name="sendForm" method="get" >
   <input type="checkbox" name="pollution"  value="co" aria-describedby="basic-addon1" onclick="oneCheckbox(this);"> 
   <span class='label info_value' aria-describedby="basic-addon1">CO</span> </input>
   <input type="checkbox" name="pollution" value="no2" onclick="oneCheckbox(this);">
@@ -146,14 +147,16 @@ sec_session_start();
   <span class='label info_value' aria-describedby="basic-addon1">SO2</span> </input>
   <input type="checkbox" name="pollution" value="o3" onclick="oneCheckbox(this);">
   <span class='label info_value' aria-describedby="basic-addon1">O3</span> </input>
-  </form>
+  </form> -->
 	 	   
   
-  <button id="drop" class="btn btn-warning" style="width:100%;" onclick="drop();">Start</button>   
+  <!-- <button id="drop" class="btn btn-warning" style="width:100%;" onclick="drop();">Start</button>    -->
   
-  <div id="chart_div">
-  </div>                           
+  <!-- <div id="chart_div">
+  </div -->>                           
   
+  <div id='image_sensor'>
+
   </div>
   </div>      
 
