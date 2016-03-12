@@ -1,18 +1,12 @@
 <?php
 	include ("../include.php");
 	
-    $start = $_POST[start_time];
+  $start = $_POST[start_time];
 	$end = $_POST[end_time];
 	$kind = $_POST[pollution];
 	$session_id = $_POST[session_id];
 	$criteria = $_POST[creteria]; 
-	/*
-   $start = '2016-02-02';
-   $end = '2016-02-10';
-   $session_id = "7";
-   $kind = 'co';
-   $criteria = "secondly";
-   */
+	
 
 	
 	

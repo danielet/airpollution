@@ -12,8 +12,11 @@ var newCircle = new Array();
 var ctrlShowData = false;
 
 
+
+var dictMarker={};
+
 google.load('visualization', '1', {'packages':['corechart']});
-google.setOnLoadCallback(drawChart);
+// google.setOnLoadCallback(drawChart);
 
 
 //CHECK EVERY 5 SECONDS
@@ -22,9 +25,9 @@ function testMarker()
 {
   // $(document).ready(function() {
   // $("#drop").click(function() {
+		var url = "../php/map/googlemap_array.php"	
 
-		var url = "../php/map/googlemap_array.php"		
-		setInterval(function (){
+    setInterval(function (){
 			$.ajax({
 				type: "POST",
 				url: url,
@@ -34,14 +37,33 @@ function testMarker()
 					
           neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
-					{				    
-            neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
-					}
+					{	
+            neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};     
+             
+            if(arr[i].name in dictMarker )
+            {
+              latlng = dictMarker[arr[i].name];
+
+              //check if lat and lng              
+              if(latlng["lat"] == parseFloat(arr[i].lat) &&  latlng["lng"] == parseFloat(arr[i].lng)  ){
+                dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 0};
+              }
+					  }
+            else
+            {
+              dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              // console.log("to add ");
+            }
+          }
+
           drop();
 					chart_information(remember_id);
 					
           //TO END
-          // drawChart(chart); 										
+          if(ctrlShowData == true)
+          {
+            drawChart(chart); 										
+          }
           air_update(temp);				
 				}
 			});				
@@ -62,126 +84,47 @@ function initMap() {
 
 
 //CHANGE THIS FUNCTION
-
-function drop() {
-  clearMarkers();
-  clearCircle();
+function drop() {  
   
-  for (var j = 0; j < neighborhoods.length; j++) {
-    addMarkerWithTimeout(neighborhoods[j],0,j);
-    //pollution_color(neighborhoods[j],j,"black");
-    // var checkType = document.getElementsByName('pollution');
- //    if(checkType[0].checked == true){
- //    	if(0<=arr[j].sum_co/arr[j].count && 4.4>=arr[j].sum_co/arr[j].count){
- //    		pollution_color(neighborhoods[j],j,"green");   
- //  		}
- //    else if(4.5<=(arr[j].sum_co/arr[j].count) && 9.4>=(arr[j].sum_co/arr[j].count)){    	
- //    		pollution_color(neighborhoods[j],j,"yellow");   
- //  		} 
- //  	else if(9.5<=(arr[j].sum_co/arr[j].count) && 12.4>=(arr[j].sum_co/arr[j].count)){  		
- //    		pollution_color(neighborhoods[j],j,"orange");   
- //  		} 
- //  	else if(12.5<=(arr[j].sum_co/arr[j].count) && 15.4>=(arr[j].sum_co/arr[j].count)){  		
- //    		pollution_color(neighborhoods[j],j,"red");   
- //  		} 
- //  	else if(15.5<=(arr[j].sum_co/arr[j].count) && 30.4>=(arr[j].sum_co/arr[j].count)){ 		
- //    		pollution_color(neighborhoods[j],j,"purple");   
- //  		} 
- //  	else if(30.5<=(arr[j].sum_co/arr[j].count)){ 		
- //    		pollution_color(neighborhoods[j],j,"maroon");   
- //  		} 
-    
- //  	}
-  	
- //  	if(checkType[1].checked == true){
-    	
- //    if(0<=arr[j].sum_no2/arr[j].count && 53>=arr[j].sum_no2/arr[j].count){
- //    		pollution_color(neighborhoods[j],j,"green");   
- //  		}
- //    else if(54<=arr[j].sum_no2/arr[j].count && 100>=arr[j].sum_no2/arr[j].count){    	
- //    		pollution_color(neighborhoods[j],j,"yellow");   
- //  		} 
- //  	else if(101<=arr[j].sum_no2/arr[j].count && 360>=arr[j].sum_no2/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"orange");   
- //  		} 
- //  	else if(361<=arr[j].sum_no2/arr[j].count && 649>=arr[j].sum_no2/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"red");   
- //  		} 
- //  	else if(650<=arr[j].sum_no2/arr[j].count && 1249>=arr[j].sum_no2/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"purple");   
- //  		} 
- //  	else if(1250<=arr[j].sum_no2/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"maroon");   
- //  		} 
- //  	}
-  	
- //  	if(checkType[2].checked == true){
-    	
- //    if(0<=arr[j].sum_so2/arr[j].count && 35>=arr[j].sum_so2/arr[j].count){
- //    		pollution_color(neighborhoods[j],j,"green");   
- //  		}
- //    else if(36<=arr[j].sum_so2/arr[j].count && 75>=arr[j].sum_so2/arr[j].count){    	
- //    		pollution_color(neighborhoods[j],j,"yellow");   
- //  		} 
- //  	else if(76<=arr[j].sum_so2/arr[j].count && 185>=arr[j].sum_so2/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"orange");   
- //  		} 
- //  	else if(186<=arr[j].sum_so2/arr[j].count && 304>=arr[j].sum_so2/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"red");   
- //  		} 
- //  	else if(305<=arr[j].sum_so2/arr[j].count && 604>=arr[j].sum_so2/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"purple");   
- //  		} 
- //  	else if(605<=arr[j].sum_so2/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"maroon");   
- //  		} 
- //  	}
-  	
- //  	if(checkType[3].checked == true){
-    	
- //    if(0<=arr[j].sum_o3/arr[j].count && 54>=arr[j].sum_o3/arr[j].count){
- //    		pollution_color(neighborhoods[j],j,"green");   
- //  		}
- //    else if(55<=arr[j].sum_o3/arr[j].count && 70>=arr[j].sum_o3/arr[j].count){    	
- //    		pollution_color(neighborhoods[j],j,"yellow");   
- //  		} 
- //  	else if(71<=arr[j].sum_o3/arr[j].count && 85>=arr[j].sum_o3/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"orange");   
- //  		} 
- //  	else if(86<=arr[j].sum_o3/arr[j].count && 105>=arr[j].sum_o3/arr[j].count){  		
- //    		pollution_color(neighborhoods[j],j,"red");   
- //  		} 
- //  	else if(106<=arr[j].sum_o3/arr[j].count && 200>=arr[j].sum_o3/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"purple");   
- //  		} 
- //  	else if(201<=arr[j].sum_o3/arr[j].count){ 		
- //    		pollution_color(neighborhoods[j],j,"maroon");   
- //  		} 
- //  	}
- }
+  // clearMarkers();
+
+  // for (var j = 0; j < neighborhoods.length; j++) {
+  //   addMarkerWithTimeout(neighborhoods[j],0,j);
+  // }
+  var count=0;
+  for(var key in dictMarker)
+  {
+    addMarkerWithTimeout(dictMarker[key], 0, count);
+    count = count + 1;
+  }
+  
+
 }
 
-function addMarkerWithTimeout(position, timeout,sq) {
-	
-	
-  
-  window.setTimeout(function() {
-    marker = new google.maps.Marker(
-    {
-      position: position, 
-      map:      map,
-      sq:       sq    // marker select sequence number.
-    });       
+function addMarkerWithTimeout(infoMarker, timeout , sq) {
+	if(infoMarker["print"] == 1)
+  {
+    position ={lat: infoMarker["lat"] , lng: infoMarker["lng"] }
+    window.setTimeout(function() {
+      marker = new google.maps.Marker(
+      {
+        position: position, 
+        map:      map,
+        sq:       sq    // marker select sequence number.
+      });       
 
-  markers.push(marker);     	 
-  marker.addListener('click', function() {
-  remember_id = arr[sq].session_id;
-  chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
-  air_update(sq); 
-  ctrlShowData = true;
-	       // map.setCenter(marker.getPosition());
-  });	
-  }, timeout); 
+    markers.push(marker);     	 
+    
+    marker.addListener('click', function() {
+      remember_id = arr[sq].session_id;
+      chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
+      air_update(sq); 
+      ctrlShowData = true;
+
+  	       // map.setCenter(marker.getPosition());
+    });	
+    }, timeout); 
+  }
 
 }
 
@@ -223,37 +166,20 @@ function air_update(sq)
     document.getElementById("info5").innerHTML = arr[temp].co
     document.getElementById("info6").innerHTML = arr[temp].no2
     document.getElementById("info7").innerHTML = arr[temp].so2
-    document.getElementById("info8").innerHTML = arr[temp].o3
+    document.getElementById("info8").innerHTML = Math.round(arr[temp].o3*100)/100;
     document.getElementById("info13").innerHTML = arr[temp].pm2d5
 
-    document.getElementById("info9").innerHTML = Math.round(arr[temp].sum_co/arr[temp].count);
-    document.getElementById("info10").innerHTML = Math.round(arr[temp].sum_no2/arr[temp].count);
-    document.getElementById("info11").innerHTML = Math.round(arr[temp].sum_so2/arr[temp].count);
-    document.getElementById("info12").innerHTML= Math.round(arr[temp].sum_o3/arr[temp].count);
+    document.getElementById("info9").innerHTML = Math.round((arr[temp].sum_co/arr[temp].count)*100)/100;
+    document.getElementById("info10").innerHTML = Math.round((arr[temp].sum_no2/arr[temp].count)*100)/100;
+    document.getElementById("info11").innerHTML = Math.round((arr[temp].sum_so2/arr[temp].count)*100)/100;
+    document.getElementById("info12").innerHTML= Math.round((arr[temp].sum_o3/arr[temp].count)*100)/100;
 
 
     document.getElementById("info14").innerHTML = arr[temp].temp;
     
     document.getElementById("info15").innerHTML = arr[temp].rr;  
   }
-  // info1.text = arr[temp].user_id;
-  // info2.value = arr[temp].time;
-  // info3.value = arr[temp].lat;
-  // info4.value = arr[temp].lng;
-  // info5.value = arr[temp].co;
-  // info6.value = arr[temp].no2;
-  // info7.value = arr[temp].so2;
-  // info8.value = arr[temp].o3;
   
-  // info9.value = arr[temp].sum_co/arr[temp].count;
-  // info10.value = arr[temp].sum_no2/arr[temp].count;
-  // info11.value = arr[temp].sum_so2/arr[temp].count;
-  // info12.value = arr[temp].sum_o3/arr[temp].count;
-  
-  // info13.value = arr[temp].pm2d5;
-  // info14.value = arr[temp].temp;
-  // info15.value = arr[temp].rr;	 		
-		  
 }
 
 function pollution_color(neighborhoods,j,color){
@@ -280,15 +206,14 @@ function oneCheckbox(check){
     }
 function chart_information(session){
 	 	$(document).ready(function() {
-		var url = "../php/map/realtime_chart.php"
-		
+
+		var url = "../php/map/realtime_chart.php"		
 		$.ajax({
 			type: "POST",
 			url: url,
 			data:{session:session},
 			success: function(response) {
 				chart=response;
-						
 			}
 		});
 		return false;
@@ -301,16 +226,44 @@ function drawChart(chart) {
   // Create our data table out of JSON data loaded from server.
   var data = new google.visualization.DataTable(chart);
   var options = {
-      title: 'Air Pollution',
-      is3D: 'true',
-      width: 400,
-      height: 300,
-     // explorer : {}  // vertical size change
+      // title: 'Air Pollution',
+    legend: { position: 'bottom', alignment: 'start' },
+    is3D: 'true',
+    explorer : {},  // vertical size change
+    series: {
+                0: {targetAxisIndex:0},
+                // 1: {targetAxisIndex:1}
+            },
+    vAxes: {
+              // Adds titles to each axis.
+              // 0: {title: '(PM 2.5) ug/ft^3'},
+              0: {title: 'ppb'},
+            },
     };
    
   // Instantiate and draw our chart, passing in some options.
   // Do not forget to check your div ID
-  // var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-  // chart.draw(data, options);
+  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
 }
    
+
+
+
+// info1.text = arr[temp].user_id;
+  // info2.value = arr[temp].time;
+  // info3.value = arr[temp].lat;
+  // info4.value = arr[temp].lng;
+  // info5.value = arr[temp].co;
+  // info6.value = arr[temp].no2;
+  // info7.value = arr[temp].so2;
+  // info8.value = arr[temp].o3;
+  
+  // info9.value = arr[temp].sum_co/arr[temp].count;
+  // info10.value = arr[temp].sum_no2/arr[temp].count;
+  // info11.value = arr[temp].sum_so2/arr[temp].count;
+  // info12.value = arr[temp].sum_o3/arr[temp].count;
+  
+  // info13.value = arr[temp].pm2d5;
+  // info14.value = arr[temp].temp;
+  // info15.value = arr[temp].rr;        
