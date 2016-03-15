@@ -15,7 +15,7 @@ define("CAN_REGISTER", "any");
 define("DEFAULT_ROLE", "member");
 
 define("SECURE", FALSE);    // FOR DEVELOPMENT ONLY!!!!
-
+define("PATH_CSV", "../../../SESSION_FILES/");    // FOR DEVELOPMENT ONLY!!!!
 
 // 2. DB 
 function sql_connect($db_host, $db_user, $db_pass, $db_name) // my database connect

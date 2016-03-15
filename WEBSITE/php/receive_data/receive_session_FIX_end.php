@@ -15,10 +15,12 @@ $filename = 'aaa';	   // It is user when insert to file_info table
 $time ='2016-00-00 00:00:00';*/
 
 
-
+	echo "$uid";
+	echo "$mac";
 	// set path, save a csv file name and location in database.
-	$path = "../csv/";                                      
+	$path = PATH_CSV;
 	// get device_id using mac address.
+	
 	$query = "SELECT device_id FROM device WHERE mac = '".$mac."';";
 	$list = mysql_query($query);
 	$info = mysql_fetch_array($list);
@@ -31,12 +33,10 @@ $time ='2016-00-00 00:00:00';*/
 	$info = mysql_fetch_array($list);
 	$sid = $info['session_id'];	
 	
-	
-	
-	
+
 	// INSERT FILE INFORMATION
-	// $query = "INSERT INTO file_info (session_id,file_name,path) VALUES ('".$sid."','".$filename."','".$path."');";
-	// mysql_query($query);
+	$query = "INSERT INTO file_info (session_id,file_name, path) VALUES ('".$sid."','".$filename."','".$path."');";
+	mysql_query($query);
 	
 	
 	// get session_id 
@@ -53,17 +53,10 @@ $time ='2016-00-00 00:00:00';*/
 	mysql_query($query);
 	
 
-	
-	// // get session_id from valid data of session table.
-	// $query = "SELECT session_id FROM session WHERE user_id = '".$uid."' and device_id = '".$did."' and endtime = '0000-00-00 00:00:00';";
-	// $list = mysql_query($query);
-	// $info = mysql_fetch_array($list);
-	// $sid = $info['session_id'];
-	
-	//echo $time.$sid.$did;
-	
+
 	// when session stop, insert endtime to session table. It means session is end.
 	$query = "UPDATE session SET endtime = '".$time."' WHERE session_id = '" .$sid. "'";
 	mysql_query($query);
-	echo $uid;
+
+	echo "T";
 ?>

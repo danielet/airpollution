@@ -35,11 +35,12 @@ function testMarker()
 				success: function(response) {
 					arr = JSON.parse(response);
 					
-          neighborhoods=[];
+          // neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
 					{	
-            neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};     
-             
+            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};     
+          
+            drop();   
             if(arr[i].name in dictMarker )
             {
               latlng = dictMarker[arr[i].name];
@@ -56,7 +57,7 @@ function testMarker()
             }
           }
 
-          drop();
+          
 					chart_information(remember_id);
 					
           //TO END
@@ -101,6 +102,9 @@ function drop() {
 
 }
 
+
+
+//ADD MARKER
 function addMarkerWithTimeout(infoMarker, timeout , sq) {
 	if(infoMarker["print"] == 1)
   {
