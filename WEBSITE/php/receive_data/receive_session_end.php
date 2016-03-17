@@ -64,6 +64,5 @@ $time ='2016-00-00 00:00:00';*/
 	
 	// when session stop, insert endtime to session table. It means session is end.
 	$query = "UPDATE session SET endtime = '".$time."' WHERE session_id = '" .$sid. "'";
-	mysql_query($query);
-	echo $uid;
+	mysql_query($query);	
 ?>

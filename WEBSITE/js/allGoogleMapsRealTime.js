@@ -13,31 +13,31 @@ var newCircle = new Array();
 google.load('visualization', '1', {'packages':['corechart']});
 google.setOnLoadCallback(drawChart);
 
-$(document).ready(function() {
-	$("#drop").click(function() {
+// $(document).ready(function() {
+// 	$("#drop").click(function() {
 	
-		var url = "../php/map/all_googlemap_array.php"		
-		setInterval(function (){
+// 		var url = "../php/map/all_googlemap_array.php"		
+// 		setInterval(function (){
 	
-			$.ajax({
-				type: "POST",
-				url: url,
-				async: false, //동기 방식
-				success: function(response) {
-					arr = JSON.parse(response);
-					//10초마다 리플리쉬 시킨다 1000이 1초가 된다.
-					neighborhoods=[];
-					for(var i=0; i<arr.length; i++)
-					{				
-					neighborhoods[i] = 
-					{lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
-					 }
-					drop();								
-				}
-			});				
-		},5000);	
-	});
-});
+// 			$.ajax({
+// 				type: "POST",
+// 				url: url,
+// 				async: false, //동기 방식
+// 				success: function(response) {
+// 					arr = JSON.parse(response);
+// 					//10초마다 리플리쉬 시킨다 1000이 1초가 된다.
+// 					neighborhoods=[];
+// 					for(var i=0; i<arr.length; i++)
+// 					{				
+// 					neighborhoods[i] = 
+// 					{lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
+// 					 }
+// 					drop();								
+// 				}
+// 			});				
+// 		},5000);	
+// 	});
+// });
 
 
 
@@ -48,14 +48,14 @@ function initMap() {
   });
 }
 
-function drop() {
-  clearMarkers();
-  for (var j = 0; j < neighborhoods.length; j++) {
-    addMarkerWithTimeout(neighborhoods[j],0,j);
-    //pollution_color(neighborhoods[j],j,"black");
+// function drop() {
+//   clearMarkers();
+//   for (var j = 0; j < neighborhoods.length; j++) {
+//     addMarkerWithTimeout(neighborhoods[j],0,j);
+//     //pollution_color(neighborhoods[j],j,"black");
   	
- }
-}
+//  }
+// }
 
 function addMarkerWithTimeout(position, timeout,sq) {
 	var image="../img/marker1.png";
@@ -100,49 +100,60 @@ function clearMarkers() {
 }
 
 
-function air_update(sq)
-{
-	temp = sq;
-		// select marker, show data
-    	     info1.value = arr[temp].user_id;
-    	     info2.value = arr[temp].time;
-             info3.value = arr[temp].lat;
-		     info4.value = arr[temp].lng;
-		 	 info5.value = arr[temp].co;
-		 	 info6.value = arr[temp].no2;
-		 	 info7.value = arr[temp].so2;
-		 	 info8.value = arr[temp].o3;
-		 	 info13.value = arr[temp].pm2d5;
-		 	 info14.value = arr[temp].temp;
-		 	 info15.value = arr[temp].rr;
-		 	 session.value = arr[temp].session_id; 		
+// function air_update(sq)
+// {
+// 	temp = sq;
+// 		// select marker, show data
+//     	     info1.value = arr[temp].user_id;
+//     	     info2.value = arr[temp].time;
+//              info3.value = arr[temp].lat;
+// 		     info4.value = arr[temp].lng;
+// 		 	 info5.value = arr[temp].co;
+// 		 	 info6.value = arr[temp].no2;
+// 		 	 info7.value = arr[temp].so2;
+// 		 	 info8.value = arr[temp].o3;
+// 		 	 info13.value = arr[temp].pm2d5;
+// 		 	 info14.value = arr[temp].temp;
+// 		 	 info15.value = arr[temp].rr;
+// 		 	 session.value = arr[temp].session_id; 		
 		  
-}
+// }
 
 function chart_information(){
-	 	$(document).ready(function() {
-		var url = "../php/map/search_chart.php"
-		var form_data = {
-			start_time : $("#start_time").val(),
-			end_time : $("#end_time").val(),
-			pollution: value,
-			session_id: $("#session").val(),
-			creteria: $("#creteria").val(),
-			
-		};
-		$.ajax({
-			type: "POST",
-			url: url,
-			data:form_data,
-			success: function(response) {
-				chart=response;
-				drawChart(chart);
-			}
-		});
-		return false;
+
+ 	// $(document).ready(function() {
+	var url = "../php/map/search_chart.php"
+	var form_data = {
+		start_time 	: $("#start_time").val(),
+		end_time 	: $("#end_time").val(),
+		// pollution 	: value,
+		// session_id	: $("#session").val(),
+		// creteria	: $("#creteria").val(),			
+		// uid 		: u_id
+
+	};
+
+
+	// Console.log(start_time)
+	$.ajax({
+		type: "POST",
+		url: url,
+		data:form_data,
+		success: function(response) {
+
+			console.log(response)
+
+			// chart=response;
+			// drawChart(chart);
+		}
 	});
+	return false;
+	// });
 
 }
+
+
+
 
 function drawChart(chart) {
 
@@ -159,15 +170,15 @@ function drawChart(chart) {
           // Do not forget to check your div ID
           var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
           chart.draw(data, options);
-        }
+}
 
-function oneCheckbox(check){
-        var obj = document.getElementsByName("pollution");
-        for(var i=0; i<obj.length; i++){
-            if(obj[i] != check){
-                obj[i].checked = false;
-            }
-            else
-            	value = obj[i].value;
-        }
-    }
+// function oneCheckbox(check){
+//         var obj = document.getElementsByName("pollution");
+//         for(var i=0; i<obj.length; i++){
+//             if(obj[i] != check){
+//                 obj[i].checked = false;
+//             }
+//             else
+//             	value = obj[i].value;
+//         }
+//   }
