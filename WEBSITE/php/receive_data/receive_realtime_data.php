@@ -1,5 +1,5 @@
 <?
-	include ("../include.php");
+	include_once ("../include.php");
 	
 	$VALUE_HOUR = 720;
 

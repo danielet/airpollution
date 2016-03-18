@@ -12,8 +12,12 @@ var newCircle = new Array();
 var ctrlShowData = false;
 
 
+var selectedStation;
 
 var dictMarker={};
+
+
+var valueReturn = 0;
 
 google.load('visualization', '1', {'packages':['corechart']});
 // google.setOnLoadCallback(drawChart);
@@ -38,9 +42,7 @@ function testMarker()
           // neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
 					{	
-            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};     
-          
-            drop();   
+            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};                    
             if(arr[i].name in dictMarker )
             {
               latlng = dictMarker[arr[i].name];
@@ -56,22 +58,20 @@ function testMarker()
               // console.log("to add ");
             }
           }
-
           
-					chart_information(remember_id);
+          drop();
+					
 					
           //TO END
           if(ctrlShowData == true)
           {
-            drawChart(chart); 										
+            chart_information(remember_id);
+            drawChart(chart , arr[selectedStation].name); 										
           }
           air_update(temp);				
 				}
 			});				
 		},5000);	
-	// });
-// });
-
 }
 
 function initMap() {
@@ -82,7 +82,6 @@ function initMap() {
 
   
 }
-
 
 //CHANGE THIS FUNCTION
 function drop() {  
@@ -102,14 +101,12 @@ function drop() {
 
 }
 
-
-
 //ADD MARKER
 function addMarkerWithTimeout(infoMarker, timeout , sq) {
 	if(infoMarker["print"] == 1)
   {
     position ={lat: infoMarker["lat"] , lng: infoMarker["lng"] }
-    window.setTimeout(function() {
+    // window.setTimeout(function() {
       marker = new google.maps.Marker(
       {
         position: position, 
@@ -120,15 +117,53 @@ function addMarkerWithTimeout(infoMarker, timeout , sq) {
     markers.push(marker);     	 
     
     marker.addListener('click', function() {
+
       remember_id = arr[sq].session_id;
       chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
-      air_update(sq); 
+
+      if(valueReturn ==0)
+      {      
+        document.getElementById("alpha").style.background = "#f0ad4e";
+      }
+      else
+      {
+       document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+      }
+      air_update(sq);
+      selectedStation = sq;
       ctrlShowData = true;
 
   	       // map.setCenter(marker.getPosition());
     });	
-    }, timeout); 
+    // }, timeout); 
   }
+
+}
+
+
+function changeChart(whichChart)
+{
+
+  console.log(whichChart);
+  if(valueReturn != whichChart)
+  {
+    valueReturn = whichChart;
+  }
+  
+  if(ctrlShowData == true)
+  {
+    if(valueReturn ==0)
+      {      
+        document.getElementById("alpha").style.background = "#f0ad4e";
+        document.getElementById("pm2d5").style.background = "#c0c0c0";
+      }
+      else
+      {
+        document.getElementById("alpha").style.background = "#c0c0c0";
+       document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+      }
+  }
+
 
 }
 
@@ -164,12 +199,13 @@ function air_update(sq)
   if(ctrlShowData == true)
   {
     // document.getElementById("info1").innerHTML = arr[temp].user_id
-    document.getElementById("info2").innerHTML = arr[temp].time
-    document.getElementById("info3").innerHTML = arr[temp].lat
-    document.getElementById("info4").innerHTML = arr[temp].lng
+    document.getElementById("info2").innerHTML = arr[temp].time.split(" ")[1];
+    document.getElementById("info3").innerHTML = Math.round((arr[temp].lat*100))/100;
+    document.getElementById("info4").innerHTML = Math.round((arr[temp].lng*100))/100;
     document.getElementById("info5").innerHTML = arr[temp].co
     document.getElementById("info6").innerHTML = arr[temp].no2
     document.getElementById("info7").innerHTML = arr[temp].so2
+
     document.getElementById("info8").innerHTML = Math.round(arr[temp].o3*100)/100;
     document.getElementById("info13").innerHTML = arr[temp].pm2d5
 
@@ -179,13 +215,74 @@ function air_update(sq)
     document.getElementById("info12").innerHTML= Math.round((arr[temp].sum_o3/arr[temp].count)*100)/100;
 
 
-    document.getElementById("info14").innerHTML = arr[temp].temp;
-    
-    document.getElementById("info15").innerHTML = arr[temp].rr;  
+    document.getElementById("info14").innerHTML = arr[temp].temp;    
+    // document.getElementById("info15").innerHTML = arr[temp].rr;  
   }
   
 }
 
+function chart_information(session){
+	 	// $(document).ready(function() {
+    // console.log(session)
+		var url = "../php/map/realtime_chart.php"		
+
+		$.ajax({
+			type: "POST",    
+			url: url,
+      async:false,
+      data:{session:session, dataReturn:valueReturn},
+			success: function(response) {
+        arr2 = JSON.parse(response);
+				chart=arr2;        
+			},
+
+      error: function(textStatus, errorTrown){
+        console.log(textStatus);
+      }
+		});
+		return false;
+	// });
+
+}
+
+function drawChart(chart, name) {
+
+  // Create our data table out of JSON data loaded from server.
+  var data = new google.visualization.DataTable(chart);
+  var stringYaxis = 'ppb';
+  if(valueReturn != 0)
+  {
+    stringYaxis = 'ug/m^3';
+  }
+  
+  var options = {
+    title: 'Air Pollution ' + name,
+    legend: { position: 'right', alignment: 'start' },
+    // is3D: 'true',
+    explorer : {},  // vertical size change
+    // curveType: "function",
+    backgroundColor: '#E4E4E4',
+    series: {
+            targetAxisIndex:0
+    },
+    
+    vAxes: {            
+        0:{title: stringYaxis}      
+    },
+    hAxes:{
+      0:{title: 'Time 1 hour'},
+      
+    }         
+    };
+   
+
+   
+  // Instantiate and draw our chart, passing in some options.
+  // Do not forget to check your div ID
+  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+   
 function pollution_color(neighborhoods,j,color){
       
       cityCircle.push(new google.maps.Circle({
@@ -200,74 +297,15 @@ function pollution_color(neighborhoods,j,color){
     }))  
 }
 
-function oneCheckbox(check){
-        var obj = document.getElementsByName("pollution");
-        for(var i=0; i<obj.length; i++){
-            if(obj[i] != check){
-                obj[i].checked = false;
-            }
-        }
-    }
-function chart_information(session){
-	 	$(document).ready(function() {
+// function oneCheckbox(check)
+// {
+//         var obj = document.getElementsByName("pollution");
+//         for(var i=0; i<obj.length; i++)
+//         {
+//             if(obj[i] != check)
+//             {
+//                 obj[i].checked = false;
+//             }
+//         }
+//     }
 
-		var url = "../php/map/realtime_chart.php"		
-		$.ajax({
-			type: "POST",
-			url: url,
-			data:{session:session},
-			success: function(response) {
-				chart=response;
-			}
-		});
-		return false;
-	});
-
-}
-
-function drawChart(chart) {
-
-  // Create our data table out of JSON data loaded from server.
-  var data = new google.visualization.DataTable(chart);
-  var options = {
-      // title: 'Air Pollution',
-    legend: { position: 'bottom', alignment: 'start' },
-    is3D: 'true',
-    explorer : {},  // vertical size change
-    series: {
-                0: {targetAxisIndex:0},
-                // 1: {targetAxisIndex:1}
-            },
-    vAxes: {
-              // Adds titles to each axis.
-              // 0: {title: '(PM 2.5) ug/ft^3'},
-              0: {title: 'ppb'},
-            },
-    };
-   
-  // Instantiate and draw our chart, passing in some options.
-  // Do not forget to check your div ID
-  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-  chart.draw(data, options);
-}
-   
-
-
-
-// info1.text = arr[temp].user_id;
-  // info2.value = arr[temp].time;
-  // info3.value = arr[temp].lat;
-  // info4.value = arr[temp].lng;
-  // info5.value = arr[temp].co;
-  // info6.value = arr[temp].no2;
-  // info7.value = arr[temp].so2;
-  // info8.value = arr[temp].o3;
-  
-  // info9.value = arr[temp].sum_co/arr[temp].count;
-  // info10.value = arr[temp].sum_no2/arr[temp].count;
-  // info11.value = arr[temp].sum_so2/arr[temp].count;
-  // info12.value = arr[temp].sum_o3/arr[temp].count;
-  
-  // info13.value = arr[temp].pm2d5;
-  // info14.value = arr[temp].temp;
-  // info15.value = arr[temp].rr;        

@@ -32,11 +32,14 @@ sec_session_start();
       header('Location: http://airpollution.calit2.net/WEBSITE/');
     }
   ?>
+
+
   <nav class="navbar navbar-inverse navbar-fixed-top">
   <!-- <div  class="navbar-collapse collapse "> -->
     <span class="label navbar-left" id='titleReal'>Air Pollution Testbed</span>
   
   <form  class="navbar-form navbar-right">
+  <a href="./admin_login.php"><input value="Admin"type="button" class="btn btn-success"></a>
   <a href="../php/user_info/logout.php"><input name="logout" value="Logout"type="button" placeholder="ID" class="btn btn-success"></a>
   <a href="./changeinfo.php"><button type="button" class="btn btn-success">Modify</button></a>                      
   <a href="../index.php"><button type="button" class="btn btn-success">Home</button></a>                      
@@ -47,27 +50,23 @@ sec_session_start();
 
 <div class="row">
   <div id="sidebar-wrapper">  
-    <a href="./admin_login.php"><input value="Admin"type="button" class="btn btn-success vert"></a>
-    <a href="./all_googlemap.php"><input value="All sessions"type="button" class="btn btn-success vert"></a>
-    <a href="./googlemap.php"><input value="Real Time"type="button" class="btn btn-success vert"></a>         
+    <a href="./googlemap.php"><input value="Real Time"type="button" class="btn btn-success vert"></a>   
+    <a href=""><input value="Netatmo"type="button" class="btn  vert"></a> 
+    <a href=""><input value="Airbeam"type="button" class="btn  vert"></a>               
+    <a href="./all_googlemap.php"><input value="All sessions"type="button" class="btn vert"></a>
   </div>  
-
   <div id="map">
   </div>
-
 <div id ='s_right'>  
     <!-- <h1><span class="label label-info" style="width:100%">INFO Real Time</span></h1> -->
   <!-- <div id='quick' >
   <span class="label label-info mapReal">ID</span>
   <span id ="info1" class="label info_value " aria-describedby="basic-addon1"> ID VALUE </span>   
-  </div> -->
-        
+  </div> -->     
   <div id='quick2'>
   <span class="label label-info mapReal">TIME</span>
   <span id="info2" name ="2"  class='label info_value'   aria-describedby="basic-addon1">TIME</span>      
-  </div>
-  
-       
+  </div>      
   <div id = 'quick3'>
   <span class="label label-info mapReal">LAT</span>  
   <span id="info3" name="3" class='label info_value'   aria-describedby="basic-addon1">LAT</span>
@@ -130,10 +129,10 @@ sec_session_start();
   </div>                         
   
           
-  <div id='quick15'>               
+  <!-- <div id='quick15'>               
   <span class="label label-info mapReal" >RR</span>
   <span id="info15" class="label info_value" aria-describedby="basic-addon1">RR</span>
-  </div>
+  </div> -->
 
 </div>
   
@@ -154,10 +153,20 @@ sec_session_start();
   <!-- <button id="drop" class="btn btn-warning" style="width:100%;" onclick="drop();">Start</button>    -->
 </div>      
 
-<!-- <div class='row'>                            -->
+<div class='rowChar'>                           
+
+<div id='bottom_left'>
+  <input value="Alphasense"type="button" id="alpha" class="btn vert" onclick="changeChart(0)">
+  <input value="PM 2.5"     type="button" id="pm2d5" class="btn  vert" onclick="changeChart(1)">
+</div>
+
 <div id='chart_div'>
+</div>
+
+<div id='bottom_right'>
 </div>  
-<!-- </div>   -->
+
+</div>  
   
 
   </body>
