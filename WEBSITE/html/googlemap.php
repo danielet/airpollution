@@ -25,8 +25,8 @@ sec_session_start();
   </head>
 
   <body onload="testMarker();">      
-  <!-- <body >       -->
-<?php
+  
+  <?php
     if(login_check()!= true)
     {    
       header('Location: http://airpollution.calit2.net/WEBSITE/');
@@ -51,7 +51,7 @@ sec_session_start();
 <div class="row">
   <div id="sidebar-wrapper">  
     <a href="./googlemap.php"><input value="Real Time"type="button" class="btn btn-success vert"></a>   
-    <a href=""><input value="Netatmo"type="button" class="btn  vert"></a> 
+    <a href="../html/netatmoMap.php"><input value="Netatmo"type="button" class="btn  vert"></a> 
     <a href=""><input value="Airbeam"type="button" class="btn  vert"></a>               
     <a href="./all_googlemap.php"><input value="All sessions"type="button" class="btn vert"></a>
   </div>  
@@ -127,17 +127,13 @@ sec_session_start();
   <span class="label label-info mapReal">Temp[C]</span>
   <span id="info14" name="4" class='label info_value'  aria-describedby="basic-addon1">TEMP</span>
   </div>                         
-  
           
   <!-- <div id='quick15'>               
   <span class="label label-info mapReal" >RR</span>
   <span id="info15" class="label info_value" aria-describedby="basic-addon1">RR</span>
   </div> -->
 
-</div>
-  
-  
-      
+</div>    
   <!-- <form name="sendForm" method="get" >
   <input type="checkbox" name="pollution"  value="co" aria-describedby="basic-addon1" onclick="oneCheckbox(this);"> 
   <span class='label info_value' aria-describedby="basic-addon1">CO</span> </input>
@@ -156,8 +152,8 @@ sec_session_start();
 <div class='rowChar'>                           
 
 <div id='bottom_left'>
-  <input value="Alphasense"type="button" id="alpha" class="btn vert" onclick="changeChart(0)">
-  <input value="PM 2.5"     type="button" id="pm2d5" class="btn  vert" onclick="changeChart(1)">
+  <input value="Alphasense" type="button" id="alpha" class="btn vert" onclick="changeChart(0)">
+  <input value="PM 2.5"     type="button" id="pm2d5" class="btn vert" onclick="changeChart(1)">
 </div>
 
 <div id='chart_div'>

@@ -10,6 +10,7 @@ margin-left:0;
 .vert{
     margin-bottom: 5px;
     width:100%;
+    color:white;
 }
 
 .mapReal{
@@ -110,7 +111,24 @@ float:left;
     color:white;
 }
 
+
+#outdoor:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
+}
+
+#outdoor{
+    color:white;
+}
+
 #pm2d5:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
+}
+
+#indoor:hover {
   color: #fff;
   background-color: #f0ad4e;
   border-color: #398439;
@@ -119,3 +137,25 @@ float:left;
 #pm2d5{
     color:white;
 }
+
+#indoor{
+    color:white;
+}
+
+
+#bottom_left_netatmo { 
+    float:left;    
+    width: 10%;
+    height: 43%;    
+    background: #000;
+    
+} 
+#bottom_right_netatmo{
+    float:left;
+    /*margin-left:2%;*/    
+    background: #000;
+    height: 43%; 
+    width: 10%;
+}   
+
+

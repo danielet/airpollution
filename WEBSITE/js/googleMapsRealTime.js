@@ -241,7 +241,7 @@ function chart_information(session){
       }
 		});
 		return false;
-	// });
+	
 
 }
 
