@@ -63,8 +63,7 @@ function createTableAndMarkers()
                 return function () {                  
                   arrayID=marker.id.split(";");
                   markerSelected = marker;
-                  //plot chart!
-                  console.log(arrayID[0]);
+                  //plot chart!                  
                   $("#outdoor").prop("disabled",false);
       
                   if(marker.ownership == 1)
@@ -74,6 +73,7 @@ function createTableAndMarkers()
                   }
                   else
                   {
+                    $("#indoor").prop("disabled",true);
                     drawChartOutdoor(arrayID[0], arrayID[1], marker.ownership) 
                   }
 
@@ -97,11 +97,7 @@ function drawChartOutdoor(macvar, idvar, Ownership)
 {      
       var test = new google.visualization.DataTable();
            
-      var arrayTime = ["00.00", "00.30" , "01.00","01.30", "02.00", "02.30", "03.00" , "03.30","04.00", "04.30",
-                       "05.00", "05.30" , "06.00","06.30", "07.00", "07.30", "08.00" , "08.30","09.00", "09.30",
-                       "10.00", "10.30" , "11.00","11.30", "12.00", "12.30", "13.00" , "14.30","15.00", "15.30",
-                       "16.00", "16.30" , "17.00","17.30", "18.00", "18.30", "19.00" , "19.30","20.00", "20.30",
-                       "21.00", "21.30" , "22.00","22.30", "23.00", "23.30"];
+      
       console.log(macvar) 
       console.log(idvar)
       console.log(Ownership)                
@@ -109,8 +105,8 @@ function drawChartOutdoor(macvar, idvar, Ownership)
           async: false
       });
 
-      if(Ownership == 0)
-      {
+      // if(Ownership == 0)
+      // {
         $.getJSON('../php/map/retrieveInfo.php',{mac:macvar,id:idvar} ,function(data) {
           format: "json"   
 
@@ -121,10 +117,12 @@ function drawChartOutdoor(macvar, idvar, Ownership)
         .done(function(data){        
           test.addColumn('string', 'Time');
           test.addColumn('number', 'Temperature');
-          test.addColumn('number', 'Humidity');          
+          test.addColumn('number', 'Humidity');     
+          console.log("QUA");
+          stringData=data.timestamp[0].split(" ");
           for (var ii=0; ii < data.temp.length; ii++)
           {        
-            test.addRow([ arrayTime[0] , data.temp[ii],data.hum[ii] ]);     
+            test.addRow([ data.timestamp[ii].split(" ")[1]  , data.temp[ii],data.hum[ii] ]);     
           }
           
                 
@@ -134,8 +132,8 @@ function drawChartOutdoor(macvar, idvar, Ownership)
         });
             
         var options = {
-            title: 'NetAtmo Outdoor',            
-            legend: { position: 'bottom' },
+            title: 'NetAtmo Outdoor ' + stringData[0] + ' Station: '+ macvar,            
+            legend: { position: 'rigth' },
 
             series: {
                 0: {targetAxisIndex:0},
@@ -148,7 +146,7 @@ function drawChartOutdoor(macvar, idvar, Ownership)
             },
         };
 
-      }
+      // }
       
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
       chart.draw(test, options);
@@ -159,8 +157,6 @@ function changeChartOutdoor()
 
   arrayID=markerSelected.id.split(";");
   console.log(arrayID[0]);
-  
-
   drawChartOutdoor(arrayID[0], arrayID[1], markerSelected.ownership) 
 
   if(markerSelected.ownership ==0)
@@ -184,11 +180,6 @@ function drawChartIndoor(macvar, idvar, Ownership)
 
   var test = new google.visualization.DataTable();
          
-  var arrayTime = ["00.00", "00.30" , "01.00","01.30", "02.00", "02.30", "03.00" , "03.30","04.00", "04.30",
-                   "05.00", "05.30" , "06.00","06.30", "07.00", "07.30", "08.00" , "08.30","09.00", "09.30",
-                   "10.00", "10.30" , "11.00","11.30", "12.00", "12.30", "13.00" , "14.30","15.00", "15.30",
-                   "16.00", "16.30" , "17.00","17.30", "18.00", "18.30", "19.00" , "19.30","20.00", "20.30",
-                   "21.00", "21.30" , "22.00","22.30", "23.00", "23.30"];
                   
   $.ajaxSetup({
       async: false
@@ -208,10 +199,12 @@ function drawChartIndoor(macvar, idvar, Ownership)
     test.addColumn('number', 'CO2');
     test.addColumn('number', 'Noise');
     // var proof = JSON.parse(data);  
-    
+    stringData=data.timestamp[0].split(" ");
     for (var ii=0; ii < data.CO2.length; ii++)
     {        
-      test.addRow([ arrayTime[0] , data.CO2[ii],data.Noise[ii] ]);     
+      time = data.timestamp[ii].split(" ")
+      console.log(time[1]);
+      test.addRow([ time[1], data.CO2[ii],data.Noise[ii] ]);     
     }
     document.getElementById("outdoor").style.background ="#c0c0c0"; 
     document.getElementById("indoor").style.background =  "#f0ad4e";
@@ -219,9 +212,8 @@ function drawChartIndoor(macvar, idvar, Ownership)
   
 
   var options = {
-      title: 'NetAtmo Indoor',
-      curveType: 'function',
-      legend: { position: 'bottom' },
+      title: 'NetAtmo Indoor ' + stringData[0] + ' Station: '+ macvar,
+      legend: { position: 'rigth' },
 
       series: {
           0: {targetAxisIndex:0},
