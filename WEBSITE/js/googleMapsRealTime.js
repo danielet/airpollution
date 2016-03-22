@@ -20,18 +20,13 @@ var dictMarker={};
 var valueReturn = 0;
 
 google.load('visualization', '1', {'packages':['corechart']});
-// google.setOnLoadCallback(drawChart);
-
 
 //CHECK EVERY 5 SECONDS
 
 function testMarker()
 {
-  // $(document).ready(function() {
-  // $("#drop").click(function() {
-		var url = "../php/map/googlemap_array.php"	
 
-    setInterval(function (){
+		var url = "../php/map/googlemap_array.php"	
 			$.ajax({
 				type: "POST",
 				url: url,
@@ -39,39 +34,73 @@ function testMarker()
 				success: function(response) {
 					arr = JSON.parse(response);
 					
-          // neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
-					{	
-            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};                    
+					{	          
             if(arr[i].name in dictMarker )
+            {          
+              latlng = dictMarker[arr[i].name];
+
+              //check if lat and lng              
+              if(latlng["lat"] == parseFloat(arr[i].lat) &&  latlng["lng"] == parseFloat(arr[i].lng)  ){
+                dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              }
+					  }
+            else
             {
+              dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              console.log("to add ");              
+            }
+          }
+          drop();          
+				}
+			});				
+
+  loopFunction();
+}
+
+
+function loopFunction()
+{
+  var url = "../php/map/googlemap_array.php"  
+  setInterval(function (){
+      $.ajax({
+        type: "POST",
+        url: url,
+        async: false, 
+        success: function(response) {
+          arr = JSON.parse(response);
+          
+          // neighborhoods=[];
+          for(var i=0; i<arr.length; i++)
+          { 
+            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};                            
+            if(arr[i].name in dictMarker )
+            {          
               latlng = dictMarker[arr[i].name];
 
               //check if lat and lng              
               if(latlng["lat"] == parseFloat(arr[i].lat) &&  latlng["lng"] == parseFloat(arr[i].lng)  ){
                 dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 0};
               }
-					  }
+            }
             else
             {
               dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
-              // console.log("to add ");
+              console.log("to add ");
+              // addMarkerWithTimeout(arr[i], i);
             }
           }
-          
           drop();
-					
-					
           //TO END
           if(ctrlShowData == true)
           {
             chart_information(remember_id);
-            drawChart(chart , arr[selectedStation].name); 										
+            drawChart(chart , arr[selectedStation].name);                     
           }
-          air_update(temp);				
-				}
-			});				
-		},5000);	
+          air_update(temp);       
+        }
+      });       
+    },5000); 
 }
 
 function initMap() {
@@ -86,15 +115,10 @@ function initMap() {
 //CHANGE THIS FUNCTION
 function drop() {  
   
-  // clearMarkers();
-
-  // for (var j = 0; j < neighborhoods.length; j++) {
-  //   addMarkerWithTimeout(neighborhoods[j],0,j);
-  // }
   var count=0;
   for(var key in dictMarker)
   {
-    addMarkerWithTimeout(dictMarker[key], 0, count);
+    addMarkerWithTimeout(dictMarker[key], count);
     count = count + 1;
   }
   
@@ -102,25 +126,31 @@ function drop() {
 }
 
 //ADD MARKER
-function addMarkerWithTimeout(infoMarker, timeout , sq) {
+function addMarkerWithTimeout(infoMarker , sq) {
 	if(infoMarker["print"] == 1)
   {
+    var pinColor = "FE7569";
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                            + pinColor,
+                new google.maps.Size(21, 34),
+                new google.maps.Point(0,0),
+                new google.maps.Point(10, 34)
+                );
+
     position ={lat: infoMarker["lat"] , lng: infoMarker["lng"] }
-    // window.setTimeout(function() {
-      marker = new google.maps.Marker(
+    marker = new google.maps.Marker(
       {
         position: position, 
         map:      map,
-        sq:       sq    // marker select sequence number.
+        sq:       sq,    // marker select sequence number.
+        icon:pinImage
       });       
 
     markers.push(marker);     	 
     
     marker.addListener('click', function() {
-
       remember_id = arr[sq].session_id;
-      chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
-
+      chart_information(arr[sq].session_id);    	 		 	   	 	 	 	      
       if(valueReturn ==0)
       {      
         document.getElementById("alpha").style.background = "#f0ad4e";
@@ -129,13 +159,24 @@ function addMarkerWithTimeout(infoMarker, timeout , sq) {
       {
        document.getElementById("pm2d5").style.background = "#f0ad4e"; 
       }
+
+      var pinColor = "008000";
+      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                            + pinColor,
+                new google.maps.Size(21, 34),
+                new google.maps.Point(0,0),
+                new google.maps.Point(10, 34)
+                );
+      marker.setIcon(pinImage);
       air_update(sq);
       selectedStation = sq;
       ctrlShowData = true;
 
-  	       // map.setCenter(marker.getPosition());
+      chart_information(arr[sq].session_id);
+      drawChart(chart , arr[sq].name);
+      
+      map.setCenter(marker.getPosition());
     });	
-    // }, timeout); 
   }
 
 }
@@ -144,12 +185,16 @@ function addMarkerWithTimeout(infoMarker, timeout , sq) {
 function changeChart(whichChart)
 {
 
-  console.log(whichChart);
   if(valueReturn != whichChart)
   {
     valueReturn = whichChart;
+    
+
   }
   
+  chart_information(remember_id);
+  drawChart(chart , arr[selectedStation].name);                     
+
   if(ctrlShowData == true)
   {
     if(valueReturn ==0)
@@ -160,7 +205,7 @@ function changeChart(whichChart)
       else
       {
         document.getElementById("alpha").style.background = "#c0c0c0";
-       document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+        document.getElementById("pm2d5").style.background = "#f0ad4e"; 
       }
   }
 
@@ -196,8 +241,6 @@ function air_update(sq)
 {
 	temp = sq;		
   
-  if(ctrlShowData == true)
-  {
     // document.getElementById("info1").innerHTML = arr[temp].user_id
     document.getElementById("info2").innerHTML = arr[temp].time.split(" ")[1];
     document.getElementById("info3").innerHTML = Math.round((arr[temp].lat*100))/100;
@@ -216,8 +259,6 @@ function air_update(sq)
 
 
     document.getElementById("info14").innerHTML = arr[temp].temp;    
-    // document.getElementById("info15").innerHTML = arr[temp].rr;  
-  }
   
 }
 
@@ -297,15 +338,5 @@ function pollution_color(neighborhoods,j,color){
     }))  
 }
 
-// function oneCheckbox(check)
-// {
-//         var obj = document.getElementsByName("pollution");
-//         for(var i=0; i<obj.length; i++)
-//         {
-//             if(obj[i] != check)
-//             {
-//                 obj[i].checked = false;
-//             }
-//         }
-//     }
+
 

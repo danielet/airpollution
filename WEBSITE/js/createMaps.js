@@ -17,6 +17,8 @@ function initMap()
   }); 
 }
 
+var prevMarker ;
+
 function createTableAndMarkers()
 {
           
@@ -62,7 +64,7 @@ function createTableAndMarkers()
               google.maps.event.addListener(marker, 'click', (function (marker, ii) {
                 return function () {                  
                   arrayID=marker.id.split(";");
-                  markerSelected = marker;
+                  
                   //plot chart!                  
                   $("#outdoor").prop("disabled",false);
       
@@ -76,6 +78,38 @@ function createTableAndMarkers()
                     $("#indoor").prop("disabled",true);
                     drawChartOutdoor(arrayID[0], arrayID[1], marker.ownership) 
                   }
+
+                  var pinColor = "000000";
+                  var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                            + pinColor,
+                  new google.maps.Size(21, 34),
+                  new google.maps.Point(0,0),
+                  new google.maps.Point(10, 34)
+                  );
+                  marker.setIcon(pinImage);
+
+                  if(markerSelected != null)
+                  {
+                    
+                    var pinColor
+                    if(markerSelected.ownership == 1)                    
+                    {
+                      pinColor = "008000";                 
+                    }
+                    else
+                    {
+                      pinColor = "FE7569";
+                    }
+                    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                          + pinColor,
+                    new google.maps.Size(21, 34),
+                    new google.maps.Point(0,0),
+                    new google.maps.Point(10, 34)
+                    );                  
+                    markerSelected.setIcon(pinImage);
+                  }                
+                  
+                  markerSelected = marker;
 
                 };
               })(marker, ii));
@@ -96,11 +130,7 @@ function createTableAndMarkers()
 function drawChartOutdoor(macvar, idvar, Ownership) 
 {      
       var test = new google.visualization.DataTable();
-           
-      
-      console.log(macvar) 
-      console.log(idvar)
-      console.log(Ownership)                
+                        
       $.ajaxSetup({
           async: false
       });
@@ -118,7 +148,7 @@ function drawChartOutdoor(macvar, idvar, Ownership)
           test.addColumn('string', 'Time');
           test.addColumn('number', 'Temperature');
           test.addColumn('number', 'Humidity');     
-          console.log("QUA");
+        
           stringData=data.timestamp[0].split(" ");
           for (var ii=0; ii < data.temp.length; ii++)
           {        
@@ -141,8 +171,8 @@ function drawChartOutdoor(macvar, idvar, Ownership)
             },
              vAxes: {
               // Adds titles to each axis.
-              0: {title: 'Temperature'},
-              1: {title: 'Humidity'}
+              0: {title: 'Temperature [C]'},
+              1: {title: 'Humidity [Hg]'}
             },
         };
 
@@ -203,7 +233,6 @@ function drawChartIndoor(macvar, idvar, Ownership)
     for (var ii=0; ii < data.CO2.length; ii++)
     {        
       time = data.timestamp[ii].split(" ")
-      console.log(time[1]);
       test.addRow([ time[1], data.CO2[ii],data.Noise[ii] ]);     
     }
     document.getElementById("outdoor").style.background ="#c0c0c0"; 
@@ -221,8 +250,8 @@ function drawChartIndoor(macvar, idvar, Ownership)
       },
        vAxes: {
         // Adds titles to each axis.
-        0: {title: 'CO2'},
-        1: {title: 'Noise'}
+        0: {title: 'CO2 [ppm]'},
+        1: {title: 'Noise [dB]'}
       },
   };
   var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
