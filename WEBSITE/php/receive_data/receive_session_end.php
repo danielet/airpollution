@@ -19,7 +19,8 @@ $json = file_get_contents('php://input');
 			mysql_query($query);
 			$query = "DELETE FROM realtime WHERE session_id = '".$sid."';";
 			mysql_query($query);
-
+			$query = "INSERT INTO file_info (session_id,file_name, path) VALUES ('".$sid."','".$filename."','".$path."');";
+			mysql_query($query);
 		}
 		else
 		{

@@ -124,7 +124,7 @@ function drop() {
   
 
 }
-
+var beforeChecked = false
 //ADD MARKER
 function addMarkerWithTimeout(infoMarker , sq) {
 	if(infoMarker["print"] == 1)
@@ -146,37 +146,54 @@ function addMarkerWithTimeout(infoMarker , sq) {
         icon:pinImage
       });       
 
-    markers.push(marker);     	 
-    
-    marker.addListener('click', function() {
-      remember_id = arr[sq].session_id;
-      chart_information(arr[sq].session_id);    	 		 	   	 	 	 	      
-      if(valueReturn ==0)
-      {      
-        document.getElementById("alpha").style.background = "#f0ad4e";
-      }
-      else
-      {
-       document.getElementById("pm2d5").style.background = "#f0ad4e"; 
-      }
-
-      var pinColor = "008000";
-      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
-                            + pinColor,
-                new google.maps.Size(21, 34),
-                new google.maps.Point(0,0),
-                new google.maps.Point(10, 34)
-                );
-      marker.setIcon(pinImage);
-      air_update(sq);
-      selectedStation = sq;
-      ctrlShowData = true;
-
-      chart_information(arr[sq].session_id);
-      drawChart(chart , arr[sq].name);
+    markers.push(marker);     	     
+    google.maps.event.addListener(marker, 'click', (function (marker, sq) {
+      return function () {  
       
-      map.setCenter(marker.getPosition());
-    });	
+        remember_id = arr[sq].session_id;
+        chart_information(arr[sq].session_id);                            
+        if(valueReturn ==0)
+        {      
+          document.getElementById("alpha").style.background = "#f0ad4e";
+        }
+        else
+        {
+         document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+        }
+
+        var pinColor = "008000";
+        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                              + pinColor,
+                  new google.maps.Size(21, 34),
+                  new google.maps.Point(0,0),
+                  new google.maps.Point(10, 34)
+                  );
+        marker.setIcon(pinImage);
+        air_update(sq);
+        
+        ctrlShowData = true;
+
+        chart_information(arr[sq].session_id);
+        drawChart(chart , arr[sq].name);
+        map.setCenter(marker.getPosition());
+
+        //CHANGE THE COLOR
+        if(beforeChecked == true)
+        {          
+          var pinColor = "FE7569";
+          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                              + pinColor,
+                  new google.maps.Size(21, 34),
+                  new google.maps.Point(0,0),
+                  new google.maps.Point(10, 34)
+          );
+          markers[selectedStation].setIcon(pinImage);
+        }              
+        selectedStation = sq;
+        beforeChecked = true
+
+      }
+    })(marker, sq));;
   }
 
 }
