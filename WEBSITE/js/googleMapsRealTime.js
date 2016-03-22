@@ -9,16 +9,24 @@ var marker;
 var arr = new Array();
 var cityCircle = new Array();
 var newCircle = new Array();
-google.load('visualization', '1', {'packages':['corechart']});
-google.setOnLoadCallback(drawChart);
+var ctrlShowData = false;
 
+
+var selectedStation;
+
+var dictMarker={};
+
+
+var valueReturn = 0;
+
+google.load('visualization', '1', {'packages':['corechart']});
 
 //CHECK EVERY 5 SECONDS
-$(document).ready(function() {
-	$("#drop").click(function() {
-		var url = "../php/map/googlemap_array.php"		
-		setInterval(function (){
-	
+
+function testMarker()
+{
+
+		var url = "../php/map/googlemap_array.php"	
 			$.ajax({
 				type: "POST",
 				url: url,
@@ -26,170 +34,199 @@ $(document).ready(function() {
 				success: function(response) {
 					arr = JSON.parse(response);
 					
-          neighborhoods=[];
 					for(var i=0; i<arr.length; i++)
-					{				    
-					 neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};										
-					 }
-          drop();
-					chart_information(remember_id);
-					
+					{	          
+            if(arr[i].name in dictMarker )
+            {          
+              latlng = dictMarker[arr[i].name];
 
-          //TO END
-          // drawChart(chart); 					
-					
-          air_update(temp);				
+              //check if lat and lng              
+              if(latlng["lat"] == parseFloat(arr[i].lat) &&  latlng["lng"] == parseFloat(arr[i].lng)  ){
+                dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              }
+					  }
+            else
+            {
+              dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              console.log("to add ");              
+            }
+          }
+          drop();          
 				}
 			});				
-		},5000);	
-	});
-});
+
+  loopFunction();
+}
 
 
+function loopFunction()
+{
+  var url = "../php/map/googlemap_array.php"  
+  setInterval(function (){
+      $.ajax({
+        type: "POST",
+        url: url,
+        async: false, 
+        success: function(response) {
+          arr = JSON.parse(response);
+          
+          // neighborhoods=[];
+          for(var i=0; i<arr.length; i++)
+          { 
+            // neighborhoods[i] = {lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng)};                            
+            if(arr[i].name in dictMarker )
+            {          
+              latlng = dictMarker[arr[i].name];
+
+              //check if lat and lng              
+              if(latlng["lat"] == parseFloat(arr[i].lat) &&  latlng["lng"] == parseFloat(arr[i].lng)  ){
+                dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 0};
+              }
+            }
+            else
+            {
+              dictMarker[arr[i].name]={lat: parseFloat(arr[i].lat), lng: parseFloat(arr[i].lng), print: 1};
+              console.log("to add ");
+              // addMarkerWithTimeout(arr[i], i);
+            }
+          }
+          drop();
+          //TO END
+          if(ctrlShowData == true)
+          {
+            chart_information(remember_id);
+            drawChart(chart , arr[selectedStation].name);                     
+          }
+          air_update(temp);       
+        }
+      });       
+    },5000); 
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
     zoom: 13,
     center: {lat: 32.899, lng: -117.22}
   });
-}
 
+  
+}
 
 //CHANGE THIS FUNCTION
-
-function drop() {
-  clearMarkers();
-  clearCircle();
+function drop() {  
   
-  for (var j = 0; j < neighborhoods.length; j++) {
-    addMarkerWithTimeout(neighborhoods[j],0,j);
-    //pollution_color(neighborhoods[j],j,"black");
-    var checkType = document.getElementsByName('pollution');
-    if(checkType[0].checked == true){
-    	if(0<=arr[j].sum_co/arr[j].count && 4.4>=arr[j].sum_co/arr[j].count){
-    		pollution_color(neighborhoods[j],j,"green");   
-  		}
-    else if(4.5<=(arr[j].sum_co/arr[j].count) && 9.4>=(arr[j].sum_co/arr[j].count)){    	
-    		pollution_color(neighborhoods[j],j,"yellow");   
-  		} 
-  	else if(9.5<=(arr[j].sum_co/arr[j].count) && 12.4>=(arr[j].sum_co/arr[j].count)){  		
-    		pollution_color(neighborhoods[j],j,"orange");   
-  		} 
-  	else if(12.5<=(arr[j].sum_co/arr[j].count) && 15.4>=(arr[j].sum_co/arr[j].count)){  		
-    		pollution_color(neighborhoods[j],j,"red");   
-  		} 
-  	else if(15.5<=(arr[j].sum_co/arr[j].count) && 30.4>=(arr[j].sum_co/arr[j].count)){ 		
-    		pollution_color(neighborhoods[j],j,"purple");   
-  		} 
-  	else if(30.5<=(arr[j].sum_co/arr[j].count)){ 		
-    		pollution_color(neighborhoods[j],j,"maroon");   
-  		} 
-    
-  	}
-  	
-  	if(checkType[1].checked == true){
-    	
-    if(0<=arr[j].sum_no2/arr[j].count && 53>=arr[j].sum_no2/arr[j].count){
-    		pollution_color(neighborhoods[j],j,"green");   
-  		}
-    else if(54<=arr[j].sum_no2/arr[j].count && 100>=arr[j].sum_no2/arr[j].count){    	
-    		pollution_color(neighborhoods[j],j,"yellow");   
-  		} 
-  	else if(101<=arr[j].sum_no2/arr[j].count && 360>=arr[j].sum_no2/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"orange");   
-  		} 
-  	else if(361<=arr[j].sum_no2/arr[j].count && 649>=arr[j].sum_no2/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"red");   
-  		} 
-  	else if(650<=arr[j].sum_no2/arr[j].count && 1249>=arr[j].sum_no2/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"purple");   
-  		} 
-  	else if(1250<=arr[j].sum_no2/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"maroon");   
-  		} 
-  	}
-  	
-  	if(checkType[2].checked == true){
-    	
-    if(0<=arr[j].sum_so2/arr[j].count && 35>=arr[j].sum_so2/arr[j].count){
-    		pollution_color(neighborhoods[j],j,"green");   
-  		}
-    else if(36<=arr[j].sum_so2/arr[j].count && 75>=arr[j].sum_so2/arr[j].count){    	
-    		pollution_color(neighborhoods[j],j,"yellow");   
-  		} 
-  	else if(76<=arr[j].sum_so2/arr[j].count && 185>=arr[j].sum_so2/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"orange");   
-  		} 
-  	else if(186<=arr[j].sum_so2/arr[j].count && 304>=arr[j].sum_so2/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"red");   
-  		} 
-  	else if(305<=arr[j].sum_so2/arr[j].count && 604>=arr[j].sum_so2/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"purple");   
-  		} 
-  	else if(605<=arr[j].sum_so2/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"maroon");   
-  		} 
-  	}
-  	
-  	if(checkType[3].checked == true){
-    	
-    if(0<=arr[j].sum_o3/arr[j].count && 54>=arr[j].sum_o3/arr[j].count){
-    		pollution_color(neighborhoods[j],j,"green");   
-  		}
-    else if(55<=arr[j].sum_o3/arr[j].count && 70>=arr[j].sum_o3/arr[j].count){    	
-    		pollution_color(neighborhoods[j],j,"yellow");   
-  		} 
-  	else if(71<=arr[j].sum_o3/arr[j].count && 85>=arr[j].sum_o3/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"orange");   
-  		} 
-  	else if(86<=arr[j].sum_o3/arr[j].count && 105>=arr[j].sum_o3/arr[j].count){  		
-    		pollution_color(neighborhoods[j],j,"red");   
-  		} 
-  	else if(106<=arr[j].sum_o3/arr[j].count && 200>=arr[j].sum_o3/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"purple");   
-  		} 
-  	else if(201<=arr[j].sum_o3/arr[j].count){ 		
-    		pollution_color(neighborhoods[j],j,"maroon");   
-  		} 
-  	}
- }
+  var count=0;
+  for(var key in dictMarker)
+  {
+    addMarkerWithTimeout(dictMarker[key], count);
+    count = count + 1;
+  }
+  
+
+}
+var beforeChecked = false
+//ADD MARKER
+function addMarkerWithTimeout(infoMarker , sq) {
+	if(infoMarker["print"] == 1)
+  {
+    var pinColor = "FE7569";
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                            + pinColor,
+                new google.maps.Size(21, 34),
+                new google.maps.Point(0,0),
+                new google.maps.Point(10, 34)
+                );
+
+    position ={lat: infoMarker["lat"] , lng: infoMarker["lng"] }
+    marker = new google.maps.Marker(
+      {
+        position: position, 
+        map:      map,
+        sq:       sq,    // marker select sequence number.
+        icon:pinImage
+      });       
+
+    markers.push(marker);     	     
+    google.maps.event.addListener(marker, 'click', (function (marker, sq) {
+      return function () {  
+      
+        remember_id = arr[sq].session_id;
+        chart_information(arr[sq].session_id);                            
+        if(valueReturn ==0)
+        {      
+          document.getElementById("alpha").style.background = "#f0ad4e";
+        }
+        else
+        {
+         document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+        }
+
+        var pinColor = "008000";
+        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                              + pinColor,
+                  new google.maps.Size(21, 34),
+                  new google.maps.Point(0,0),
+                  new google.maps.Point(10, 34)
+                  );
+        marker.setIcon(pinImage);
+        air_update(sq);
+        
+        ctrlShowData = true;
+
+        chart_information(arr[sq].session_id);
+        drawChart(chart , arr[sq].name);
+        map.setCenter(marker.getPosition());
+
+        //CHANGE THE COLOR
+        if(beforeChecked == true)
+        {          
+          var pinColor = "FE7569";
+          var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" 
+                              + pinColor,
+                  new google.maps.Size(21, 34),
+                  new google.maps.Point(0,0),
+                  new google.maps.Point(10, 34)
+          );
+          markers[selectedStation].setIcon(pinImage);
+        }              
+        selectedStation = sq;
+        beforeChecked = true
+
+      }
+    })(marker, sq));;
+  }
+
 }
 
-function addMarkerWithTimeout(position, timeout,sq) {
-	var image;
-	if(sq==0){
-	 image = "../img/marker1.png";
-	}
-	else if(sq==1){
-	image = "../img/marker2.png";
-	}
-	else if(sq==2){
-	image = "../img/marker3.png";
-	}
-	else if(sq==3){
-	image = "../img/marker4.png";
-	}
-	else{
-		image = "../img/marker5.png";
-	}
-	
+
+function changeChart(whichChart)
+{
+
+  if(valueReturn != whichChart)
+  {
+    valueReturn = whichChart;
+    
+
+  }
   
-  window.setTimeout(function() {
-  	 marker = new google.maps.Marker(
-    	{position: position, 
-    	 map: map,
-    	 icon: image,
-    	 sq:sq    // marker select sequence number.
-    	 }
-    	);       
-       	 markers.push(marker);     	 
-    	 marker.addListener('click', function() {
-    	 	remember_id = arr[sq].session_id;
-    	 	chart_information(arr[sq].session_id);    	 		 	   	 	 	 	
-    	 	air_update(sq); 
-	       // map.setCenter(marker.getPosition());
-  });	
-  }, timeout);   
+  chart_information(remember_id);
+  drawChart(chart , arr[selectedStation].name);                     
+
+  if(ctrlShowData == true)
+  {
+    if(valueReturn ==0)
+      {      
+        document.getElementById("alpha").style.background = "#f0ad4e";
+        document.getElementById("pm2d5").style.background = "#c0c0c0";
+      }
+      else
+      {
+        document.getElementById("alpha").style.background = "#c0c0c0";
+        document.getElementById("pm2d5").style.background = "#f0ad4e"; 
+      }
+  }
+
+
 }
 
 function setMapOnAll(map) {
@@ -221,47 +258,89 @@ function air_update(sq)
 {
 	temp = sq;		
   
-  // info1.text = arr[temp].user_id;
-  document.getElementById("info1").innerHTML = arr[temp].user_id
-  document.getElementById("info2").innerHTML = arr[temp].time
-  document.getElementById("info3").innerHTML = arr[temp].lat
-  document.getElementById("info4").innerHTML = arr[temp].lng
-  document.getElementById("info5").innerHTML = arr[temp].co
-  document.getElementById("info6").innerHTML = arr[temp].no2
-  document.getElementById("info7").innerHTML = arr[temp].so2
-  document.getElementById("info8").innerHTML = arr[temp].o3
-  document.getElementById("info13").innerHTML = arr[temp].pm2d5
+    // document.getElementById("info1").innerHTML = arr[temp].user_id
+    document.getElementById("info2").innerHTML = arr[temp].time.split(" ")[1];
+    document.getElementById("info3").innerHTML = Math.round((arr[temp].lat*100))/100;
+    document.getElementById("info4").innerHTML = Math.round((arr[temp].lng*100))/100;
+    document.getElementById("info5").innerHTML = arr[temp].co
+    document.getElementById("info6").innerHTML = arr[temp].no2
+    document.getElementById("info7").innerHTML = arr[temp].so2
 
-  document.getElementById("info9").innerHTML = Math.round(arr[temp].sum_co/arr[temp].count);
-  document.getElementById("info10").innerHTML = Math.round(arr[temp].sum_no2/arr[temp].count);
-  document.getElementById("info11").innerHTML = Math.round(arr[temp].sum_so2/arr[temp].count);
-  document.getElementById("info12").innerHTML= Math.round(arr[temp].sum_o3/arr[temp].count);
+    document.getElementById("info8").innerHTML = Math.round(arr[temp].o3*100)/100;
+    document.getElementById("info13").innerHTML = arr[temp].pm2d5
+
+    document.getElementById("info9").innerHTML = Math.round((arr[temp].sum_co/arr[temp].count)*100)/100;
+    document.getElementById("info10").innerHTML = Math.round((arr[temp].sum_no2/arr[temp].count)*100)/100;
+    document.getElementById("info11").innerHTML = Math.round((arr[temp].sum_so2/arr[temp].count)*100)/100;
+    document.getElementById("info12").innerHTML= Math.round((arr[temp].sum_o3/arr[temp].count)*100)/100;
 
 
-  document.getElementById("info14").innerHTML = arr[temp].temp;
+    document.getElementById("info14").innerHTML = arr[temp].temp;    
   
-  document.getElementById("info15").innerHTML = arr[temp].rr;  
-
-
-  // info2.value = arr[temp].time;
-  // info3.value = arr[temp].lat;
-  // info4.value = arr[temp].lng;
-  // info5.value = arr[temp].co;
-  // info6.value = arr[temp].no2;
-  // info7.value = arr[temp].so2;
-  // info8.value = arr[temp].o3;
-  
-  // info9.value = arr[temp].sum_co/arr[temp].count;
-  // info10.value = arr[temp].sum_no2/arr[temp].count;
-  // info11.value = arr[temp].sum_so2/arr[temp].count;
-  // info12.value = arr[temp].sum_o3/arr[temp].count;
-  
-  // info13.value = arr[temp].pm2d5;
-  // info14.value = arr[temp].temp;
-  // info15.value = arr[temp].rr;	 		
-		  
 }
 
+function chart_information(session){
+	 	// $(document).ready(function() {
+    // console.log(session)
+		var url = "../php/map/realtime_chart.php"		
+
+		$.ajax({
+			type: "POST",    
+			url: url,
+      async:false,
+      data:{session:session, dataReturn:valueReturn},
+			success: function(response) {
+        arr2 = JSON.parse(response);
+				chart=arr2;        
+			},
+
+      error: function(textStatus, errorTrown){
+        console.log(textStatus);
+      }
+		});
+		return false;
+	
+
+}
+
+function drawChart(chart, name) {
+
+  // Create our data table out of JSON data loaded from server.
+  var data = new google.visualization.DataTable(chart);
+  var stringYaxis = 'ppb';
+  if(valueReturn != 0)
+  {
+    stringYaxis = 'ug/m^3';
+  }
+  
+  var options = {
+    title: 'Air Pollution ' + name,
+    legend: { position: 'right', alignment: 'start' },
+    // is3D: 'true',
+    explorer : {},  // vertical size change
+    // curveType: "function",
+    backgroundColor: '#E4E4E4',
+    series: {
+            targetAxisIndex:0
+    },
+    
+    vAxes: {            
+        0:{title: stringYaxis}      
+    },
+    hAxes:{
+      0:{title: 'Time 1 hour'},
+      
+    }         
+    };
+   
+
+   
+  // Instantiate and draw our chart, passing in some options.
+  // Do not forget to check your div ID
+  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+   
 function pollution_color(neighborhoods,j,color){
       
       cityCircle.push(new google.maps.Circle({
@@ -276,47 +355,5 @@ function pollution_color(neighborhoods,j,color){
     }))  
 }
 
-function oneCheckbox(check){
-        var obj = document.getElementsByName("pollution");
-        for(var i=0; i<obj.length; i++){
-            if(obj[i] != check){
-                obj[i].checked = false;
-            }
-        }
-    }
-function chart_information(session){
-	 	$(document).ready(function() {
-		var url = "../php/map/realtime_chart.php"
-		
-		$.ajax({
-			type: "POST",
-			url: url,
-			data:{session:session},
-			success: function(response) {
-				chart=response;
-						
-			}
-		});
-		return false;
-	});
 
-}
 
-function drawChart(chart) {
-
-  // Create our data table out of JSON data loaded from server.
-  var data = new google.visualization.DataTable(chart);
-  var options = {
-       title: 'Air Pollution',
-      is3D: 'true',
-      width: 400,
-      height: 300,
-     // explorer : {}  // vertical size change
-    };
-   
-  // Instantiate and draw our chart, passing in some options.
-  // Do not forget to check your div ID
-  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-  chart.draw(data, options);
-}
-   

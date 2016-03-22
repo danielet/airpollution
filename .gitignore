@@ -2,6 +2,7 @@
 *.apk
 *.ap_
 
+.*
 # Files for the Dalvik VM
 *.dex
 
@@ -30,3 +31,9 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+.snapshot
+.DS_Store
+._.DS_Store
+
+SESSION_FILES/

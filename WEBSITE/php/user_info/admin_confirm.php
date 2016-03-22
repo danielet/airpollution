@@ -33,7 +33,7 @@ if($_POST["pwd"] == ""){ //if not input password,back to before page
     
 }
 
-$chk_sql = "select * from user where user_id = '".trim($_POST["user_id"])."'"; //find user_id in database
+$chk_sql = "SELECT * FROM user WHERE user_id = '".trim($_POST["user_id"])."'"; //find user_id in database
 $chk_result = sql_query($chk_sql); // execute sql
 $chk_data = mysql_fetch_array($chk_result); // save database date in array
 
@@ -53,7 +53,6 @@ if($chk_data["user_id"]){ //if user id exist in database,
         
         
     }else{
-        // 7. 비밀번호가 다르면
         ?>
         <script>
             alert("Don't match Password"); //if not matched password, back to before page.

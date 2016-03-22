@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+# encoding=utf-8
+
+import lnetatmo
+import json
+import libParserNetatmo
+authorization = lnetatmo.ClientAuth()
+# devList = lnetatmo.DeviceList(authorization)
+
+# for module, moduleData in devList.lastData().items() :
+#     # Name of the module (or station embedded module), the name you defined in the web netatmo account station management
+#     print(module)
+
+stations = lnetatmo.StationsList(authorization)
+lat_ne=	'32.963163';
+lon_ne= '-117.096405';
+lat_sw=	'32.836616';
+lon_sw=	'-117.233047';
+
+
+
+stringJSON = stations.getMeasureZone(lat_ne,lon_ne,lat_sw, lon_sw)
+rawmodules = stringJSON['body']
+
+extractSration=libParserNetatmo.parser()
+
+extractSration.parseStation(rawmodules)
+

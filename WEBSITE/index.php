@@ -1,5 +1,7 @@
 ﻿<?
-include("./php/include.php");
+include_once "./php/include.php";
+
+sec_session_start();
 ?>
 
 <!DOCTYPE html>
@@ -37,6 +39,7 @@ include("./php/include.php");
           <input type="submit" class="btn btn-success" value="Find Info"></input>
           </form> 
           </div>  
+          <!-- TO CHANGE -->
           <form  name="login_form" method="post" action="./php/user_info/login_match.php" class="navbar-form navbar-right">
             <div class="form-group">
               <input name="user_id" type="text" placeholder="E-MAIL" class="form-control">

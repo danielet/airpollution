@@ -2,21 +2,22 @@ html, body {
 height: 100%;
 width: 100%;
 margin-left:0;
-padding: 0;
+/*padding: 0;*/
+
 
 }
 
-
 .vert{
-    /*margin-left: 10px;*/
     margin-bottom: 5px;
     width:100%;
+    color:white;
 }
 
 .mapReal{
+    
     margin-top: 10px;
     /*margin-bottom: 20px;*/
-    width: 30%;
+    width: 40%;
    font-size: 12px;
    display:inline-block;
 }
@@ -31,34 +32,130 @@ padding: 0;
 }
  
 #sidebar-wrapper { 
-	position: fixed;
+	float:left;
 	width: 10%;
-	height: 100%;	
+	height: 50%;	
 	background: #000;
 	
 }
  
-#page-content-wrapper {
-	width: 100%;
-	padding: 20px;
+/*.navbar-right
+{
+    padding: 15px
+}*/
+
+#titleReal
+{
+    float:left;
+   font-size: 32px; 
 }
- 
-
-
 #s_right{
 	float:left;
     /*margin-left:2%;*/
+    
     background: #000;
-    height: 93%; 
-    width: 19%;
+    height: 50%; 
+    width: 10%;
+}
+.row{
+    float:left;
+    margin-top : 3.5%;
+    width: 100%;
+}
+.rowChar{
+    float:left;
+    /*margin-top : 3.5%;*/
+    width: 100%;
+    background-color: "#E4E4E4";
+}
+#map {
+
+    /*margin-left:10%;*/
+    float:left;
+    height: 50%;
+    width:80%;
+}
+.navbar{
+    float:left;
+width: :100%;
+}
+ 
+#bottom_left { 
+    float:left;    
+    width: 9%;
+    height: 43%;    
+    background: #000;
+    
+} 
+#bottom_right{
+    float:left;
+    /*margin-left:2%;*/    
+    background: #000;
+    height: 43%; 
+    width: 10%;
+}     
+#chart_div{
+float:left;
+ height: 43%;
+ width:80%;  
+ 
 }
 
-#map {
-    margin-left:11%;
-    margin-top : 1%;
-    float:left;
-    height: 90%;
-    width:70%;
+#alpha:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
 }
-     
+
+#alpha{
+    color:white;
+}
+
+
+#outdoor:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
+}
+
+#outdoor{
+    color:white;
+}
+
+#pm2d5:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
+}
+
+#indoor:hover {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #398439;
+}
+
+#pm2d5{
+    color:white;
+}
+
+#indoor{
+    color:white;
+}
+
+
+#bottom_left_netatmo { 
+    float:left;    
+    width: 10%;
+    height: 43%;    
+    background: #000;
+    
+} 
+#bottom_right_netatmo{
+    float:left;
+    /*margin-left:2%;*/    
+    background: #000;
+    height: 43%; 
+    width: 10%;
+}   
+
 

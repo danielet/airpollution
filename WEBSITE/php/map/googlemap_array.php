@@ -2,9 +2,13 @@
 include ("../include.php");
 	
    
-   $query = "select session.session_id,user_id,time,lat,lng,co,no2,so2,o3,temp,pm2d5,rr,sum_co,sum_so2,sum_no2,sum_o3,sum_pm2d5,count
-  			 from realtime, session
-  			 where realtime.session_id = session.session_id";
+   $query = "SELECT session.session_id, session.starttime, session.user_id, session.device_id,
+                    realtime.time, realtime.lat, realtime.lng, realtime.co,realtime.no2,realtime.so2,realtime.o3,realtime.pm2d5, 
+                    realtime.sum_co,realtime.sum_no2,realtime.sum_so2,realtime.sum_o3,realtime.sum_pm2d5,
+                    realtime.rr, realtime.temp, realtime.count, realtime.temp, sensorboard.name
+  			     FROM realtime JOIN session JOIN sensorboard
+  			     WHERE realtime.session_id = session.session_id AND session.board_id = sensorboard.board_id";
+
    $result = sql_query($query);
    
    $fields = array();
