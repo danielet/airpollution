@@ -19,7 +19,7 @@ import java.net.URL;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
-public class TransferTestActivity extends AppCompatActivity { // csv 파일 전송.
+public class TransferTestActivity extends AppCompatActivity {
     TextView messageText;
     Button uploadButton;
 
@@ -27,8 +27,8 @@ public class TransferTestActivity extends AppCompatActivity { // csv 파일 전�
     ProgressDialog dialog = null;
     String upLoadServerUri = null;
 
-    final String uploadFilePath = "storage/emulated/0/KakaoTalkDownload/";//경로를 모르겠으면, 갤러리 어플리케이션 가서 메뉴->상세 정보
-    final String uploadFileName = "hi2.csv"; //전송하고자하는 파일 이름
+    final String uploadFilePath = "storage/emulated/0/KakaoTalkDownload/";
+    final String uploadFileName = "hi2.csv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +40,11 @@ public class TransferTestActivity extends AppCompatActivity { // csv 파일 전�
         messageText  = (TextView)findViewById(R.id.messageText);
 
         messageText.setText("Uploading file path :- '/mnt/sdcard/"+uploadFileName+"'");
-        upLoadServerUri = "http://172.20.10.7/connecttest.php";//서버컴퓨터의 ip주소
+        upLoadServerUri = "http://172.20.10.7/connecttest.php";
         //"http://137.110.84.28/connecttest.php"
         //"http://137.110.83.230/airoundu/server/savecsv.php"
-//"http://137.110.83.224/recvCSV.php"
+        //"http://137.110.83.224/recvCSV.php"
+
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

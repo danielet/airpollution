@@ -42,20 +42,21 @@ public class BluetoothConnection extends Thread {
     }
 
 
-    public void run() {
+    public void run()
+    {
         // Cancel discovery because it will slow down the connection
         adapter.cancelDiscovery();
-
+        boolean conneciontOpen=false;
         try {
             // Connect the device through the socket. This will block
             // until it succeeds or throws an exception
             mConnectionLabel.sendEmptyMessage(0);
-            Log.d("BOMMASON", "CONNECTION " + mmDevice.getAddress() + " " + mmDevice.getName());
+            Log.d("MATTEO", "CONNECTION " + mmDevice.getAddress() + " " + mmDevice.getName());
             mmSocket = mmDevice.createRfcommSocketToServiceRecord(BT_UUID);
             mmSocket.connect();
-
+            conneciontOpen = true;
         } catch (Exception connectException) {
-            Log.e("BOMMASON", "There was an error while establishing Bluetooth connection. Falling back..", connectException);
+            Log.e("MATTEO", "There was an error while establishing Bluetooth connection. Falling back..", connectException);
             Class<?> clazz = mmSocket.getRemoteDevice().getClass();
             Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
             try {
@@ -64,22 +65,36 @@ public class BluetoothConnection extends Thread {
                 sockFallback = (BluetoothSocket) m.invoke(mmSocket.getRemoteDevice(), params);
                 sockFallback.connect();
                 mmSocket = sockFallback;
+                conneciontOpen = true;
             } catch (Exception e2) {
-                Log.e("BOMMASON", "Couldn't fallback while establishing Bluetooth connection. Stopping app..", e2);
+                Log.e("MATTEO", "Couldn't fallback while establishing Bluetooth connection. Stopping app..", e2);
+
 //                stopService();
                 try {
-                    Log.d("BOMMASON", "CLOSE " + mmDevice.getAddress() + " " + mmDevice.getName());
+                    Log.d("MATTEO", "CLOSE " + mmDevice.getAddress() + " " + mmDevice.getName());
                     mmSocket.close();
                 } catch (IOException closeException) {
-                    Log.d("BOMMASON", "CONNECTION CLOSE ERROR " + mmDevice.getAddress() + " " + mmDevice.getName());
+                    Log.d("MATTEO", "CONNECTION CLOSE ERROR " + mmDevice.getAddress() + " " + mmDevice.getName());
+
+
                 }
             }
         }
+        if(conneciontOpen == true) {
+            dataReadFromUdoo();
+        }
+        else
+        {
+            mConnectionLabel.sendEmptyMessage(-2);
+        }
+    }
 
+public void dataReadFromUdoo()
+{
         // Do work to manage the connection (in a separate thread)
         InputStream air_pollution;
         if (mmSocket != null) {
-            Log.d("BOMMASON", "CONNECTED WITH " + mmDevice.getAddress() + " " + mmDevice.getName());
+            Log.d("MATTEO", "CONNECTED WITH " + mmDevice.getAddress() + " " + mmDevice.getName());
             mConnectionLabel.sendEmptyMessage(1);
             try {
                 air_pollution = mmSocket.getInputStream();
@@ -89,7 +104,6 @@ public class BluetoothConnection extends Thread {
 
                 // Keep listening to the InputStream until an exception occurs
                 while (true) {
-                    Log.d("BOMMASON", "waiting for data");
                     try {
                         // Read from the InputStream
                         bytes = air_pollution.read(buffer);        // Get number of bytes and message in "buffer"
@@ -97,7 +111,6 @@ public class BluetoothConnection extends Thread {
                         String strIncom = new String(readBuf, 0, bytes);
 
                         String [] sensor_data = strIncom.split(",");
-                        Log.d("BOMMASON", "Data " + strIncom);
                         Message msg1 = new Message() ;
                         Bundle bundle_sensor_data = new Bundle();
                         bundle_sensor_data.putString("TimeStamp", sensor_data[0]);
@@ -111,12 +124,15 @@ public class BluetoothConnection extends Thread {
                         mConnectionCO.sendMessage(msg1);
 
                     } catch (IOException e) {
+                        Log.d("MATTEO" , e.toString());
+                        mConnectionLabel.sendEmptyMessage(-3);
                         break;
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.d("BOMMASON", "error");
+                mConnectionLabel.sendEmptyMessage(-2);
+                Log.d("MATTEO", "error");
             }
         }
     }
@@ -124,14 +140,14 @@ public class BluetoothConnection extends Thread {
     public void StopConnection()
     {
         try {
-            Log.d("BOMMASON" ,"CLOSE " + mmDevice.getAddress() + " " +mmDevice.getName() );
+            Log.d("MATTEO" ,"CLOSE " + mmDevice.getAddress() + " " +mmDevice.getName() );
             OutputStream cmd = mmSocket.getOutputStream();
             String ss = "CLOSE";
             cmd.write(ss.getBytes());
             mmSocket.close();
-
+            mConnectionLabel.sendEmptyMessage(2);
         } catch (IOException closeException) {
-            Log.d("BOMMASON" ,"CONNECTION CLOSE ERROR " + mmDevice.getAddress() + " " +mmDevice.getName() );
+            Log.d("MATTEO" ,"CONNECTION CLOSE ERROR " + mmDevice.getAddress() + " " +mmDevice.getName() );
         }
     }
 }

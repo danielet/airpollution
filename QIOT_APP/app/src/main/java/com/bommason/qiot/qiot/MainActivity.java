@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -38,6 +39,7 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.LineData;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ViewFlipper flipper;    //1.map  2.graph
     Timer mTimer;   //current time
     private GpsInfo gps;    //custom class for gps
-    ToggleButton tbtn_start_stop;    //toggle button (start, stop)
+    Button buttonSession;    //toggle button (start, stop)
     GoogleMap map;     // current map
     int index; // Air pollutant selected by user..
     int data_count; // The number of data transmitted by sensor
@@ -102,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String mac_add;
     String login_id = null;
 
+
+    private int session_id;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,10 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        Not Connected
-//        Connected to WebView
-//        Connected to Sensor
-//        Connected to fully
+
         user_id = (TextView) findViewById(R.id.txt_userID);
         /* Bluetooth */
         // ★ Get local Bluetooth adapter
@@ -123,13 +126,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent bt_enable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(bt_enable, REQUEST_ENABLE_BT);
         }
-        // ★ DeviceListActivity로 정보 보내주려고 Intent 생성
+        // ★ DeviceListActivity
         main_to_devicelist = new Intent(MainActivity.this, DeviceListActivity.class);
-
         // ★ Bluetooth scan button
         txt_bluetooth_state = (TextView)findViewById(R.id.txt_connect_status);
         txt_device_name = (TextView)findViewById(R.id.txt_device);
 
+
+        buttonSession = (Button) findViewById(R.id.tbtn_onoff);
         // ★ Display Text about Bluetooth Connect Status and Connceted device name
         bt_status = new Handler(){
             @Override
@@ -137,24 +141,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int s = message.what;   //message type -1,0,1
                 switch(s)
                 {
+
+                    case -3:
+
+                        if(connection_enable == true) {
+                            Log.d("MATTEO", "REOPEN CONNECTION!!!");
+                            txt_bluetooth_state.setText("Reconnect");
+                            ConnectDevice(true);
+                            buttonSession.setClickable(false);
+                        }
+                        break;
+
+                    case -2:
+                        txt_bluetooth_state.setText("Bluetooth connection error");
+                        connection_enable = false;
+                        mTimer            = null;
+                        buttonSession.setText("START");
+                    break;
                     case -1:
-                        if(login_id!=null) {
+                        if(login_id != null) {
                             txt_bluetooth_state.setText("Connected to only Web");
                         }else{
                             txt_bluetooth_state.setText("Not Connected");
                         }
+                        connection_enable = false;
+                        buttonSession.setText("START");
                         break;
                     case 0:
                         txt_bluetooth_state.setText("CONNECTING");
+                        buttonSession.setClickable(false);
                         break;
                     case 1:
-                        if(login_id!=null) {
+                        if(login_id != null) {
                             txt_bluetooth_state.setText("CONNECTED TO FULLY");
                             txt_device_name.setText(bt_device.getName().toString());
                         }else{
                             txt_bluetooth_state.setText("Connected to only Sensors");
                             txt_device_name.setText(bt_device.getName().toString());
                         }
+                        buttonSession.setClickable(true);
+                        connection_enable = true;
+                        buttonSession.setText("STOP");
+                        break;
+                    case 2:
+                        txt_bluetooth_state.setText("BL Connection Closed");
+                        txt_device_name.setText(bt_device.getName().toString());
+                        connection_enable = false;
+                        buttonSession.setText("START");
                         break;
                 }
             }
@@ -184,11 +217,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         /* MAP */
         map = ((MapFragment)getFragmentManager().findFragmentById(R.id.frg_map)).getMap();
-        MapsInitializer.initialize(MainActivity.this);
 
-        LatLng startingPoint = new LatLng(37.1422, 131.5208);   //initialize start point
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, MAP_ZOOM_LAEVEL));   //initialize zoom level
 
+        try {
+            MapsInitializer.initialize(MainActivity.this);
+        } catch (Exception e) {
+            Log.d("MATTEO" , "MAP ERROR");
+            e.printStackTrace();
+        }
+
+
+        gps = new GpsInfo(MainActivity.this);
+        if (gps.isGetLocation())
+        {  // GPS On, NN.XX
+            current_location = new LatLng(gps.getLatitude(), gps.getLongitude());
+        }
+        else
+        {
+            Log.d("MATTEO" , "MAP ERROR");
+            gps.showSettingsAlert();     // GPS setting Alert
+        }
+          /* Add a marker */
+//        map.moveCamera(CameraUpdateFactory.newLatLng(current_location)); // focus current location
+        Log.d("MATTEO" , "LAT" + current_location.latitude);
+        LatLng startingPoint = new LatLng(33.1422, -117.3308);   //initialize start point
+//
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 5));   //initialize zoom level
+//        map.setMyLocationEnabled(true);
         /* Table Text View Setting */
         txt_first = new TextView[]{(TextView) findViewById(R.id.txt_time1), (TextView) findViewById(R.id.txt_co1),
                 (TextView) findViewById(R.id.txt_so21), (TextView) findViewById(R.id.txt_no21), (TextView) findViewById(R.id.txt_o31),
@@ -212,52 +267,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         data_count =0;
         aqi = new ComputingAQI();
 
-        /* START-STOP toggle button */
-        tbtn_start_stop = (ToggleButton)findViewById(R.id.tbtn_onoff);
-        tbtn_start_stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mTimer == null) {
-                    //Timer make, start
-
-                    startActivityForResult(main_to_devicelist, REQUEST_CONNECT_DEVICE_SECURE); //////////
-                    mTimer = new Timer();
-                    if (connection_enable == true) {
-                        MainTimerTask timerTask = new MainTimerTask();
-                        mTimer.schedule(timerTask, 500, update_interval);
-                    }
-                } else {  //Timer Stop, delete
-                    if (connection_enable == true) {
-                        mTimer.cancel();
-                        mTimer = null;
-                        connection_enable = false;
-                        bt_connection.StopConnection();
-                        JSONObject json_csv = new JSONObject();
-                        Date csv_date = new Date();
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
-                        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMdd_hhmmss");
-                        String current_date = formatter.format(csv_date);
-                        String current_date_file = formatter2.format(csv_date);
-                        try {
-                            //json  uid,mac,filename,time
-                            json_csv.put("uid", login_id);
-                            json_csv.put("mac", mac_add);
-                            json_csv.put("time", current_date);
-                            json_csv.put("filename", login_id + "_" + current_date_file + ".csv");
-                            String json_data = json_csv.toString();
-                            // Send session information (uid, mac, current date, file name) to WEB using JSON
-                            new JsonTransfer().execute(getString(R.string.receive_end_url), json_data);
-
-                        } catch (Exception e) {
-                        }
-                        // Send CSV file to WEB using JSON
-                        CSVTransferThread csv_transfer = new CSVTransferThread(data_to_array);
-                        csv_transfer.execute(getString(R.string.csv_transfer_url), login_id, login_id + "_" + current_date_file + ".csv");
-                    }
-                }
-            }
-        });
-
 
         /* if Click Title TextView, This method can run. */
         SetDrawSelectedValueInGraph();
@@ -274,6 +283,128 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
     }//onCreate
 
+
+    String addressBT ;
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if (resultCode == Activity.RESULT_OK) {
+            JSONObject session = new JSONObject();
+            login_id = ((GlobalVariable) this.getApplication()).getData();
+            addressBT = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+            Date csv_date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
+            String current_date = formatter.format(csv_date);
+            mac_add = bt_adapter.getAddress().toString();
+
+            if (login_id != null) {
+                try
+                {
+                /* If user log in, change textview */
+
+                    session.put("uid", login_id);
+                    session.put("mac", mac_add);
+                    session.put("time", current_date);
+                    session.put("smac", addressBT);
+                    String str_session = session.toString();
+                    JsonTransfer aa = new JsonTransfer();
+                    String ss = aa.execute(getString(R.string.receive_start_url), str_session).get();
+
+                    JSONObject jObject = new JSONObject(ss);
+                    session_id = jObject.getInt("session_id");
+                    Log.d("MATTEO" , "RETURN " + session_id);
+                    if (session_id != -1)
+                    {
+                        ConnectDevice(true);
+//                        connection_enable = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.d("MATTEO",  e.toString());
+                    connection_enable = false;
+
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Please Login", Toast.LENGTH_SHORT).show();
+                connection_enable = false;
+
+            }
+        }
+    }
+    private void ConnectDevice(boolean secure)
+    {
+        // Get the device MAC address
+//        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+
+        // Get the BluetoothDevice object
+        bt_device = bt_adapter.getRemoteDevice(addressBT);
+        // Attempt to connect to the device
+        bt_connection = new BluetoothConnection(bt_device, bt_adapter, bt_status, bt_receivemsg);
+        bt_connection.start();
+
+    }
+
+
+
+    public void opencloseBTConnection(View v){
+        Log.d("MATTEO", "CONNECTION BUTTON");
+
+
+        if (mTimer == null) {
+            //Timer make, start
+            startActivityForResult(main_to_devicelist, REQUEST_CONNECT_DEVICE_SECURE);
+            mTimer = new Timer();
+            if (connection_enable == true) {
+                MainTimerTask timerTask = new MainTimerTask();
+                mTimer.schedule(timerTask, 500, update_interval);
+            }
+        }
+        else
+        {
+            if (connection_enable == true) {
+                mTimer.cancel();
+                mTimer = null;
+                connection_enable = false;
+                bt_connection.StopConnection();
+                closeSession();
+                //CHANGE LABEL BUTTON
+            }
+        }
+
+    }
+
+
+    private void closeSession(){
+
+
+        JSONObject json_csv = new JSONObject();
+        Date csv_date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMdd_hhmmss");
+        String current_date = formatter.format(csv_date);
+        String current_date_file = formatter2.format(csv_date);
+        try {
+            //json  uid,mac,filename,time
+            json_csv.put("uid", login_id);
+            json_csv.put("mac", mac_add);
+            json_csv.put("time", current_date);
+            json_csv.put("session_id", session_id);
+            json_csv.put("filename", login_id + "_" + current_date_file + ".csv");
+            String json_data = json_csv.toString();
+            // Send session information (uid, mac, current date, file name) to WEB using JSON
+            new JsonTransfer().execute(getString(R.string.receive_end_url), json_data);
+
+        } catch (Exception e) {
+            Log.d("MATTEO", "TOOGLE BOTTOM");
+        }
+
+        // Send CSV file to WEB using JSON
+        CSVTransferThread csv_transfer = new CSVTransferThread(data_to_array);
+        csv_transfer.execute(getString(R.string.csv_transfer_url), login_id, login_id + "_" + current_date_file + ".csv");
+
+
+    }
+
    private Handler bt_receivemsg = new Handler(){ // ★ 메세지
         @Override
         public void handleMessage(Message message){
@@ -286,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     txt_first[4].getText().toString(), txt_first[5].getText().toString(), txt_first[6].getText().toString(),
                     (current_location.latitude+""), (current_location.longitude+""), (hr+""),(prr+""));
             d_array.CsvDataMaker();
-            data_to_array.add(d_array); // 데이터를 ArrayList에 저장
+            data_to_array.add(d_array); //
             /* GRAPH */
             d_graph = new DrawGraph(mChart,data_to_array);
             d_graph.DrawGraphLineCurrent(index);
@@ -299,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };//Runnable
 
-    /*  -JasonDataInput
+    /*  -JsonDataInput
         Convert the real-time data to Jason format and transfer it to web server
         Json - user_id, mac, time, lat, lng, co, so2, no2, o3
         JsonTransfer().execute(URL,Data);
@@ -321,24 +452,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             json_dataTransfer.put("pm2.5", txt_first[5].getText().toString());
             json_dataTransfer.put("temp", txt_first[6].getText().toString());
             json_dataTransfer.put("hb", hr);
+            //MATTEO TO ADD SESSION_ID
+            json_dataTransfer.put("session_id", session_id);
             String json_string = json_dataTransfer.toString();
             new JsonTransfer().execute(getString(R.string.realtime_url),json_string);
-            //"http://137.110.83.167/recvJSON.php"
-
-
 
 
         }catch (Exception e){
 
-
+            Log.d("MATTEO" , "ERROR JSON DATA INPUT");
 
         }
     }
 
     class MainTimerTask extends TimerTask {
         public void run() {
+
             bt_receivemsg.post(mUpdateTimeTask);
-        } // ★ 여기 수정해야됨. bt_msg로.
+
+        } //
     }//TimerTask
 
     //RowDown - Shift previous data
@@ -359,6 +491,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
           /* Add a marker */
         map.moveCamera(CameraUpdateFactory.newLatLng(current_location)); // focus current location
+
+
         Date input_date =  new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
         String current_date = formatter.format(input_date);
@@ -406,110 +540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
        Initializing TextView Background Color on previously index
        if(data_count > 0 && index!=0)  compute the data to aqi value and textView[index] color change
    */
-    public void ColorChanger(){
-        //initialize BackgroundColor
-        for (int i = 1; i <=NUM_SENSOR; i++) {
-            txt_first[i].setBackgroundColor(Color.WHITE);
-            txt_second[i].setBackgroundColor(Color.WHITE);
-            txt_third[i].setBackgroundColor(Color.WHITE);
-        }
-        double aqi_value;
-        if(data_count>0 && index !=0) {
-            aqi_value = aqi.Computing(index, Double.parseDouble(txt_first[index].getText().toString()));
-            if (aqi_value > 301) {
-                txt_first[index].setBackgroundColor(Color.rgb(126, 00, 23));
-            } else if (aqi_value> 201) {
-                txt_first[index].setBackgroundColor(Color.rgb(99, 04, 76));
-            } else if (aqi_value > 151) {
-                txt_first[index].setBackgroundColor(Color.rgb(255, 00, 00));
-            } else if (aqi_value > 101) {
-                txt_first[index].setBackgroundColor(Color.rgb(255, 126, 00));
-            } else if (aqi_value > 51) {
-                txt_first[index].setBackgroundColor(Color.rgb(255, 255, 00));
-            } else {
-                txt_first[index].setBackgroundColor(Color.rgb(00, 228, 00));
-            }
-        }
-        if(data_count>1 && index !=0) {
-            aqi_value = aqi.Computing(index, Double.parseDouble(txt_second[index].getText().toString()));
-            if (aqi_value > 301) {
-                txt_second[index].setBackgroundColor(Color.rgb(126, 00, 23));
-            } else if (aqi_value > 201) {
-                txt_second[index].setBackgroundColor(Color.rgb(99, 04, 76));
-            } else if (aqi_value > 151) {
-                txt_second[index].setBackgroundColor(Color.rgb(255, 00, 00));
-            } else if (aqi_value > 101) {
-                txt_second[index].setBackgroundColor(Color.rgb(255, 126, 00));
-            } else if (aqi_value > 51) {
-                txt_second[index].setBackgroundColor(Color.rgb(255, 255, 00));
-            } else {
-                txt_second[index].setBackgroundColor(Color.rgb(00, 228, 00));
-            }
-        }
-        if(data_count>2 && index !=0) {
-            aqi_value = aqi.Computing(index, Double.parseDouble(txt_third[index].getText().toString()));
-            if (aqi_value > 301) {
-                txt_third[index].setBackgroundColor(Color.rgb(126, 00, 23));
-            } else if (aqi_value > 201) {
-                txt_third[index].setBackgroundColor(Color.rgb(99, 04, 76));
-            } else if (aqi_value > 151) {
-                txt_third[index].setBackgroundColor(Color.rgb(255, 00, 00));
-            } else if (aqi_value > 101) {
-                txt_third[index].setBackgroundColor(Color.rgb(255, 126, 00));
-            } else if (aqi_value > 51) {
-                txt_third[index].setBackgroundColor(Color.rgb(255, 255, 00));
-            } else {
-                txt_third[index].setBackgroundColor(Color.rgb(00, 228, 00));
-            }
-        }
-    }//ColorChanger
 
-    /* GRAPH. Line Chart */
-    private void SettingChart(){
-        // no description text
-        mChart.setDescription("");
-        mChart.setNoDataTextDescription("You need to provide data for the chart.");
-        // enable touch gestures
-        mChart.setTouchEnabled(true);
-        // enable scaling and dragging
-        mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(true);
-        mChart.setDrawGridBackground(false);
-        // if disabled, scaling can be done on x- and y-axis separately
-        mChart.setPinchZoom(true);
-        // set an alternative background color
-        mChart.setBackgroundColor(Color.rgb(220, 220, 220));
-        LineData data = new LineData();
-        data.setValueTextColor(Color.WHITE);
-        // add empty data
-        mChart.setData(data);
-        //Typeface tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
-        // get the legend (only possible after setting data)
-        Legend l = mChart.getLegend();
-        // modify the legend ...
-        // l.setPosition(LegendPosition.LEFT_OF_CHART);
-        l.setForm(Legend.LegendForm.LINE);
-        //l.setTypeface(tf);
-        l.setTextColor(Color.WHITE);
-        // X
-        XAxis xl = mChart.getXAxis();
-        //xl.setTypeface(tf);
-        xl.setTextColor(Color.WHITE);
-        xl.setDrawGridLines(false);
-        xl.setAvoidFirstLastClipping(true);
-        xl.setSpaceBetweenLabels(5);
-        xl.setEnabled(true);
-        // Y
-        YAxis leftAxis = mChart.getAxisLeft();
-        //leftAxis.setTypeface(tf);
-        leftAxis.setTextColor(Color.WHITE);
-        leftAxis.setAxisMaxValue(500f);
-        leftAxis.setAxisMinValue(0f);
-        leftAxis.setStartAtZero(false);
-        leftAxis.setDrawGridLines(true);
-        YAxis rightAxis = mChart.getAxisRight();
-        rightAxis.setEnabled(false);
-    }//SettingChart
 
 
     /*  onBackPressed()
@@ -520,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-            Toast.makeText(MainActivity.this, "뒤로 버튼 눌름", Toast.LENGTH_SHORT).show();
         } else {
             super.onBackPressed();
         }
@@ -542,7 +572,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-
 /*
             FragmentManager fragmentManager = getFragmentManager();
             GraphFragment grp_fragment = new GraphFragment();
@@ -553,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentTransaction.replace(R.id.container, grp_fragment);
             fragmentTransaction.commit();
 */
-            Toast.makeText(MainActivity.this, "SETTING 관련 메뉴?", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, "SETTING 관련 메뉴?", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -685,47 +714,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }); // Draw TEMP graph
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (resultCode == Activity.RESULT_OK) {
-            login_id = ((GlobalVariable)this.getApplication()).getData();
-            JSONObject session = new JSONObject();
-            String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-            Date csv_date =  new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
-            String current_date = formatter.format(csv_date);
-            mac_add = bt_adapter.getAddress().toString();
-            try {
-                /* If user log in, change textview */
-                session.put("uid",login_id);
-                session.put("mac",mac_add);
-                session.put("time", current_date);
-                session.put("smac", address);
-                String str_session = session.toString();
-                Log.w("TAG",address+"///"+mac_add);
-                new JsonTransfer().execute(getString(R.string.receive_start_url),str_session);
-            }catch (Exception e){}
-                connection_enable = true;
-            ConnectDevice(data, true);
-            try {
-                user_id.setText(login_id);
-            }catch (Exception e){}
-        }
-    }
-    private void ConnectDevice(Intent data, boolean secure) { /*★  ★*/
-        // Get the device MAC address
-        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
-        bt_device = bt_adapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        bt_connection = new BluetoothConnection(bt_device, bt_adapter, bt_status, bt_receivemsg);
-        bt_connection.start();
-    }
+
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //-------------------Polar Sensor-----------------------------------------------------//
     ////////////////////////////////////////////////////////////////////////////////////////
     @Override
-    protected void onResume() { // lifeCycle! 온리쥼 될 때 마다 추가로 되는 애들!!
+    protected void onResume() { // lifeCycle! 
         super.onResume();
         if(app.polarBleDeviceServiceConnected && app.polarBleDeviceAddress == null){
             deactivatePolar();
@@ -800,5 +797,177 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intentFilter.addAction(PolarBleService.ACTION_HR_DATA_AVAILABLE);
         return intentFilter;
     }
+
+
+
+
+    public void ColorChanger(){
+        //initialize BackgroundColor
+        for (int i = 1; i <=NUM_SENSOR; i++) {
+            txt_first[i].setBackgroundColor(Color.WHITE);
+            txt_second[i].setBackgroundColor(Color.WHITE);
+            txt_third[i].setBackgroundColor(Color.WHITE);
+        }
+        double aqi_value;
+        if(data_count>0 && index !=0) {
+            aqi_value = aqi.Computing(index, Double.parseDouble(txt_first[index].getText().toString()));
+            if (aqi_value > 301) {
+                txt_first[index].setBackgroundColor(Color.rgb(126, 00, 23));
+            } else if (aqi_value> 201) {
+                txt_first[index].setBackgroundColor(Color.rgb(99, 04, 76));
+            } else if (aqi_value > 151) {
+                txt_first[index].setBackgroundColor(Color.rgb(255, 00, 00));
+            } else if (aqi_value > 101) {
+                txt_first[index].setBackgroundColor(Color.rgb(255, 126, 00));
+            } else if (aqi_value > 51) {
+                txt_first[index].setBackgroundColor(Color.rgb(255, 255, 00));
+            } else {
+                txt_first[index].setBackgroundColor(Color.rgb(00, 228, 00));
+            }
+        }
+        if(data_count>1 && index !=0) {
+            aqi_value = aqi.Computing(index, Double.parseDouble(txt_second[index].getText().toString()));
+            if (aqi_value > 301) {
+                txt_second[index].setBackgroundColor(Color.rgb(126, 00, 23));
+            } else if (aqi_value > 201) {
+                txt_second[index].setBackgroundColor(Color.rgb(99, 04, 76));
+            } else if (aqi_value > 151) {
+                txt_second[index].setBackgroundColor(Color.rgb(255, 00, 00));
+            } else if (aqi_value > 101) {
+                txt_second[index].setBackgroundColor(Color.rgb(255, 126, 00));
+            } else if (aqi_value > 51) {
+                txt_second[index].setBackgroundColor(Color.rgb(255, 255, 00));
+            } else {
+                txt_second[index].setBackgroundColor(Color.rgb(00, 228, 00));
+            }
+        }
+        if(data_count>2 && index !=0) {
+            aqi_value = aqi.Computing(index, Double.parseDouble(txt_third[index].getText().toString()));
+            if (aqi_value > 301) {
+                txt_third[index].setBackgroundColor(Color.rgb(126, 00, 23));
+            } else if (aqi_value > 201) {
+                txt_third[index].setBackgroundColor(Color.rgb(99, 04, 76));
+            } else if (aqi_value > 151) {
+                txt_third[index].setBackgroundColor(Color.rgb(255, 00, 00));
+            } else if (aqi_value > 101) {
+                txt_third[index].setBackgroundColor(Color.rgb(255, 126, 00));
+            } else if (aqi_value > 51) {
+                txt_third[index].setBackgroundColor(Color.rgb(255, 255, 00));
+            } else {
+                txt_third[index].setBackgroundColor(Color.rgb(00, 228, 00));
+            }
+        }
+    }//ColorChanger
+
+    /* GRAPH. Line Chart */
+    private void SettingChart(){
+        // no description text
+        mChart.setDescription("");
+        mChart.setNoDataTextDescription("You need to provide data for the chart.");
+        // enable touch gestures
+        mChart.setTouchEnabled(true);
+        // enable scaling and dragging
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(true);
+        mChart.setDrawGridBackground(false);
+        // if disabled, scaling can be done on x- and y-axis separately
+        mChart.setPinchZoom(true);
+        // set an alternative background color
+        mChart.setBackgroundColor(Color.rgb(220, 220, 220));
+        LineData data = new LineData();
+        data.setValueTextColor(Color.WHITE);
+        // add empty data
+        mChart.setData(data);
+        //Typeface tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
+        // get the legend (only possible after setting data)
+        Legend l = mChart.getLegend();
+        // modify the legend ...
+        // l.setPosition(LegendPosition.LEFT_OF_CHART);
+        l.setForm(Legend.LegendForm.LINE);
+        //l.setTypeface(tf);
+        l.setTextColor(Color.WHITE);
+        // X
+        XAxis xl = mChart.getXAxis();
+        //xl.setTypeface(tf);
+        xl.setTextColor(Color.WHITE);
+        xl.setDrawGridLines(false);
+        xl.setAvoidFirstLastClipping(true);
+        xl.setSpaceBetweenLabels(5);
+        xl.setEnabled(true);
+        // Y
+        YAxis leftAxis = mChart.getAxisLeft();
+        //leftAxis.setTypeface(tf);
+        leftAxis.setTextColor(Color.WHITE);
+        leftAxis.setAxisMaxValue(500f);
+        leftAxis.setAxisMinValue(0f);
+        leftAxis.setStartAtZero(false);
+        leftAxis.setDrawGridLines(true);
+        YAxis rightAxis = mChart.getAxisRight();
+        rightAxis.setEnabled(false);
+    }//SettingChart
 }
 
+       /* START-STOP toggle button */
+//        tbtn_start_stop = (ToggleButton)findViewById(R.id.tbtn_onoff);
+
+//        tbtn_start_stop.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//                if (mTimer == null) {
+//                    //Timer make, start
+//                    startActivityForResult(main_to_devicelist, REQUEST_CONNECT_DEVICE_SECURE);
+//                    mTimer = new Timer();
+//
+//                    if (connection_enable == true) {
+//                        MainTimerTask timerTask = new MainTimerTask();
+//                        mTimer.schedule(timerTask, 500, update_interval);
+//
+//                    }
+//
+//                }
+//                else
+//                {  //Timer Stop, delete
+//                    if (connection_enable == true)
+//                    {
+////                        tbtn_start_stop.setChecked(true);
+//                        mTimer.cancel();
+//                        mTimer = null;
+//                        connection_enable = false;
+//                        bt_connection.StopConnection();
+//
+//                        JSONObject json_csv = new JSONObject();
+//                        Date csv_date = new Date();
+//                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //  "hh:mm:ss dd.MM.yyyy"
+//                        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMdd_hhmmss");
+//                        String current_date = formatter.format(csv_date);
+//                        String current_date_file = formatter2.format(csv_date);
+//                        try
+//                        {
+//                            //json  uid,mac,filename,time
+//                            json_csv.put("uid", login_id);
+//                            json_csv.put("mac", mac_add);
+//                            json_csv.put("time", current_date);
+//                            json_csv.put("session_id", session_id);
+//                            json_csv.put("filename", login_id + "_" + current_date_file + ".csv");
+//                            String json_data = json_csv.toString();
+//                            // Send session information (uid, mac, current date, file name) to WEB using JSON
+//                            new JsonTransfer().execute(getString(R.string.receive_end_url), json_data);
+//
+//                        }
+//                        catch (Exception e)
+//                        {
+//                            Log.d("MATTEO", "TOOGLE BOTTOM");
+//                        }
+//                        // Send CSV file to WEB using JSON
+//                        CSVTransferThread csv_transfer = new CSVTransferThread(data_to_array);
+//                        csv_transfer.execute(getString(R.string.csv_transfer_url), login_id, login_id + "_" + current_date_file + ".csv");
+//                    }
+////                    else
+////                    {
+////                        tbtn_start_stop.setChecked(false);
+////                    }
+//                }
+//            }
+//        });

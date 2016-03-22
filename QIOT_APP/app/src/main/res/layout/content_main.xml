@@ -44,7 +44,7 @@
                 android:id="@+id/txt_device"
                 android:layout_weight="0.69" />
 
-            <ToggleButton
+            <Button
                 android:layout_width="69dp"
                 android:layout_height="wrap_content"
                 android:text="Start"
@@ -52,7 +52,12 @@
                 android:checked="false"
                 android:textOff="Start"
                 android:textOn="Stop"
-                android:background="#e4effb" />
+                android:background="#e4effb"
+                android:onClick="opencloseBTConnection"
+                />
+
+
+
         </LinearLayout>
 
         <TableLayout

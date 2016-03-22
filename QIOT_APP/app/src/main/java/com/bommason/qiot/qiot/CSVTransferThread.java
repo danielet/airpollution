@@ -8,10 +8,15 @@ import com.opencsv.CSVWriter;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +36,21 @@ public class CSVTransferThread extends AsyncTask<String, Void, String> {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_hhmmss"); //  "hh:mm:ss dd.MM.yyyy"
     String current_date = formatter.format(csv_date);
 
+
+
+    private static String readStream(InputStream in) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
+
+            String nextLine = "";
+            while ((nextLine = reader.readLine()) != null) {
+                sb.append(nextLine);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
 
     public CSVTransferThread(ArrayList<DataArray> arrays){
         this.dataArrays = arrays;
@@ -65,6 +85,7 @@ public class CSVTransferThread extends AsyncTask<String, Void, String> {
         File CSV_file = new File(file_string);
 
         if (!CSV_file.isFile()) {
+            Log.d("MATTEO", "FILE ");
             return "0";
         } else {
 
@@ -107,7 +128,9 @@ public class CSVTransferThread extends AsyncTask<String, Void, String> {
                 // Responses from the server (code and message)
                 serverResponseCode = conn.getResponseCode();
                 String serverResponseMessage = conn.getResponseMessage();
-                Log.i("uploadFile", "HTTP Response is : " + serverResponseMessage + ": " + serverResponseCode);
+                InputStream in = new BufferedInputStream(conn.getInputStream());
+
+                Log.d("MATTEO", "HTTP Response is : " + readStream(in)  +" " + serverResponseMessage + ": " + serverResponseCode);
                 //close the streams //
                 fileInputStream.close();
                 dos.flush();

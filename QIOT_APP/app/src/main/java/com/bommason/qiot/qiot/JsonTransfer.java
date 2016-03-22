@@ -1,6 +1,7 @@
 package com.bommason.qiot.qiot;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,6 +17,10 @@ import java.net.URL;
  * Created by p on 2016-02-09.
  */
 public class JsonTransfer extends AsyncTask<String, Void, String>{
+
+
+
+
     @Override
     protected String doInBackground(String... params) {
         HttpURLConnection urlConnection;
@@ -49,7 +54,9 @@ public class JsonTransfer extends AsyncTask<String, Void, String>{
             String line = null;
             StringBuilder sb = new StringBuilder();
 
-            while ((line = bufferedReader.readLine()) != null) {
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
                 sb.append(line);
             }
 
@@ -62,5 +69,7 @@ public class JsonTransfer extends AsyncTask<String, Void, String>{
         }
         return result;
     }
+
+
 
 }

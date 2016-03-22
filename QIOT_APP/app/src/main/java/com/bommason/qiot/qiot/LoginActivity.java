@@ -49,12 +49,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {   //Sign In. Transfer Data to Web
                 try {
+
                     String check = new HttpConnectionThread(LoginActivity.this).execute(address, edt_id.getText().toString(), edt_pw.getText().toString()).get();
-                    Log.d("MATTEO", check);
-                if (check.contains("T")) {
-                    return_id();
-                    finish();
-                }} catch (Exception e) {
+
+                    if (check.contains("T")) {
+                        return_id();
+                        finish();
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
